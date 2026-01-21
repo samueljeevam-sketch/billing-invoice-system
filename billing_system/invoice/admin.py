@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Customer,product,invoice,invoiceItem
+from django.forms import BaseInlineFormSet
+from django.core.exceptions import ValidationError
+from .models import Customer, product, invoice, invoiceItem
 
 class Invoiceiteminline(admin.TabularInline):
     model=invoiceItem
@@ -15,5 +17,4 @@ class invoiceadmin(admin.ModelAdmin):
 admin.site.register(Customer)
 admin.site.register(product)
 
-
-# Register your models here.
+  
