@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.forms import BaseInlineFormSet
 from django.core.exceptions import ValidationError
 
-from .models import Customer, product, invoice, invoiceItem
+from .models import Customer, Product, Invoice, InvoiceItem
 
  
 class InvoiceItemInlineFormSet(BaseInlineFormSet):
@@ -25,13 +25,13 @@ class InvoiceItemInlineFormSet(BaseInlineFormSet):
 
 
 class InvoiceItemInline(admin.TabularInline):
-    model = invoiceItem
+    model = InvoiceItem
     extra = 1
     readonly_fields = ('price', 'gst_amount')
     formset = InvoiceItemInlineFormSet
 
 
-@admin.register(invoice)
+@admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):
     inlines = [InvoiceItemInline]
     list_display = ('id', 'customer', 'invoice_date', 'invoice_amount')
@@ -45,6 +45,6 @@ class CustomerAdmin(admin.ModelAdmin):
 
 
 # -------- PRODUCT ADMIN --------
-@admin.register(product)
+@admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'price', 'gst_percent', 'stock')

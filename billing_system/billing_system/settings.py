@@ -31,6 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'tailwind',
+    'theme',
+    'django_browser_reload',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,6 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'invoice',
 ]
+TAILWIND_APP_NAME = 'theme'
+NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
