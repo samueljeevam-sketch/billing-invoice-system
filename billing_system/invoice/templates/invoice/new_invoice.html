@@ -79,6 +79,8 @@
         <tbody>
           <template x-for="(item, index) in items" :key="index">
             <tr class="border-b border-slate-50">
+
+              <!-- ITEM -->
               <td class="py-4 pr-3">
                 <select name="product[]" x-model="item.productId"
                   @change="updatePrice(index, $event)"
@@ -92,23 +94,28 @@
                 </select>
               </td>
 
+              <!-- QTY -->
               <td class="py-4 text-center">
                 <input type="number" name="qty[]" min="1"
                   x-model.number="item.qty"
                   class="w-16 bg-white border border-slate-200 rounded-xl text-center text-[13px] font-semibold">
               </td>
 
-              <input type="number" step="0.01" name="price[]"
-                    x-model.number="item.price"
-                     readonly
-                class="w-28 bg-slate-50 border border-slate-200 rounded-xl
-              text-right text-[13px] font-mono-custom">
+              <!-- RATE -->
+              <td class="py-4 text-right">
+                <input type="number" step="0.01" name="price[]"
+                  x-model.number="item.price"
+                  readonly
+                  class="w-28 bg-slate-50 border border-slate-200 rounded-xl
+                  text-right text-[13px] font-mono-custom">
+              </td>
 
-
+              <!-- TOTAL -->
               <td class="py-4 text-right font-mono-custom font-bold text-slate-900">
                 ₹<span x-text="(item.qty * item.price).toFixed(2)"></span>
               </td>
 
+              <!-- REMOVE -->
               <td class="py-4 text-right">
                 <button type="button" @click="removeItem(index)"
                   x-show="items.length > 1"
@@ -116,6 +123,7 @@
                   ✕
                 </button>
               </td>
+
             </tr>
           </template>
         </tbody>
@@ -165,7 +173,6 @@ function invoiceHandler() {
     updatePrice(i, e) {
       const selected = e.target.options[e.target.selectedIndex]
       const price = selected.getAttribute("data-price")
-
       this.items[i].price = price ? parseFloat(price) : 0
     },
 
