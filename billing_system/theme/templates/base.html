@@ -47,17 +47,47 @@
                 </svg>
                 Overview
             </a>
+<div class="group space-y-1">
 
-            <a href="#"
-               class="flex items-center gap-4 px-4 py-4 rounded-2xl font-semibold
-                      text-slate-400 hover:text-white transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Invoices
-            </a>
+    <button
+        class="w-full flex items-center justify-between px-4 py-2
+               text-slate-300 hover:text-white hover:bg-slate-800
+               rounded-lg transition">
+        <div class="flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-5 w-5 text-slate-400 group-hover:text-indigo-400"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 7h18M3 12h18M3 17h18"/>
+            </svg>
+            <span class="font-semibold text-sm">Invoices</span>
+        </div>
+
+        <svg xmlns="http://www.w3.org/2000/svg"
+             class="h-4 w-4 text-slate-400 group-hover:text-indigo-400"
+             fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+
+    <div
+        class="ml-8 space-y-1 hidden group-hover:block transition-all">
+
+        <a href=""
+           class="block px-4 py-2 text-sm rounded-lg
+                  text-slate-400 hover:text-white hover:bg-slate-800">
+            All Invoices
+        </a>
+
+        <a href=""
+           class="block px-4 py-2 text-sm rounded-lg
+                  text-indigo-400 hover:text-white hover:bg-slate-800">
+            + New Invoice
+        </a>
+    </div>
+</div>
+
 
             <a href="#"
                class="flex items-center gap-4 px-4 py-4 rounded-2xl font-semibold
