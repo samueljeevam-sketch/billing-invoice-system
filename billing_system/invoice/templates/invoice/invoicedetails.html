@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% with currency="₹" %}
+
+<div class="max-w-4xl mx-auto my-10 bg-white shadow-2xl rounded-xl overflow-hidden border border-gray-100 print:shadow-none print:my-0">
+
+  <!-- Top Accent -->
+  <div class="h-2 bg-blue-600"></div>
+
+  <div class="p-8 md:p-12">
+
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start mb-10 gap-6">
+      <div>
+        <h1 class="text-4xl font-black tracking-tight text-gray-900 mb-2">INVOICE</h1>
+
+        <div class="flex items-center gap-3">
+          <span class="text-sm font-mono text-gray-500">
+            #{{ invoice.reference|default:"DRAFT" }}
+          </span>
+
+          <span class="px-2 py-1 text-xs font-bold uppercase rounded
+            {% if invoice.is_paid|default:False %}
+              bg-green-100 text-green-700
+            {% else %}
+              bg-amber-100 text-amber-700
+            {% endif %}
+          ">
+            {% if invoice.is_paid|default:False %}Paid{% else %}Pending{% endif %}
+          </span>
+        </div>
+      </div>
+
+      <!-- Company Info -->
+      <div class="text-right">
+        <h3 class="text-lg font-bold text-gray-800">Your Company Name</h3>
+        <p class="text-sm text-gray-500">123 Business Lane, City Tech Park</p>
+        <p class="text-sm text-gray-500">GSTIN: 22AAAAA0000A1Z5</p>
+      </div>
+    </div>
+
+    <hr class="border-gray-100 mb-10">
+
+    <!-- Billing Info -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
+
+      <!-- Customer -->
+      <div>
+        <h4 class="text-xs uppercase tracking-widest text-gray-400 font-semibold mb-3">Bill To</h4>
+        <h2 class="text-xl font-bold text-gray-800">{{ invoice.customer.name }}</h2>
+
+        <div class="text-gray-600 space-y-1 mt-2">
+          {% if invoice.customer.email %}
+          <p class="flex items-center gap-2">
+            {{ invoice.customer.email }}
+          </p>
+          {% endif %}
+
+          {% if invoice.customer.phone %}
+          <p class="flex items-center gap-2">
+            {{ invoice.customer.phone }}
+          </p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Dates -->
+      <div class="md:text-right space-y-2">
+        <p class="text-sm">
+          <span class="text-gray-400 uppercase font-semibold mr-2">Date Issued:</span>
+          <span class="text-gray-800 font-medium">
+            {{ invoice.created_at|date:"F d, Y" }}
+          </span>
+        </p>
+
+        <p class="text-sm">
+          <span class="text-gray-400 uppercase font-semibold mr-2">Due Date:</span>
+          <span class="text-gray-800 font-medium">
+            {{ invoice.due_date|date:"F d, Y"|default:"—" }}
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Items Table -->
+    <div class="rounded-lg border border-gray-100 overflow-hidden mb-8">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-50 border-b border-gray-100">
+            <th class="px-6 py-4 text-xs uppercase tracking-wider text-gray-500 font-bold">Item</th>
+            <th class="px-6 py-4 text-xs uppercase tracking-wider text-gray-500 font-bold text-center">Qty</th>
+            <th class="px-6 py-4 text-xs uppercase tracking-wider text-gray-500 font-bold text-right">Rate</th>
+            <th class="px-6 py-4 text-xs uppercase tracking-wider text-gray-500 font-bold text-right">Amount</th>
+          </tr>
+        </thead>
+
+        <tbody class="divide-y divide-gray-50">
+          {% for item in items %}
+          <tr class="hover:bg-gray-50/50 transition-colors">
+            <td class="px-6 py-5">
+              <p class="font-semibold text-gray-800">{{ item.product.name }}</p>
+              {% if item.product.description %}
+              <p class="text-xs text-gray-400 mt-1">
+                {{ item.product.description|truncatechars:50 }}
+              </p>
+              {% endif %}
+            </td>
+
+            <td class="px-6 py-5 text-center text-gray-600">{{ item.quantity }}</td>
+            <td class="px-6 py-5 text-right text-gray-600">
+              {{ currency }}{{ item.price }}
+            </td>
+            <td class="px-6 py-5 text-right font-bold text-gray-900">
+              {{ currency }}{{ item.total }}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="px-6 py-8 text-center text-gray-400">
+              No items found for this invoice
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Totals -->
+    <div class="flex flex-col md:flex-row justify-between gap-8">
+
+      <!-- Notes -->
+      <div class="flex-1">
+        <h4 class="text-xs uppercase tracking-widest text-gray-400 font-semibold mb-2">Notes</h4>
+        <p class="text-sm text-gray-500 italic">
+          Thank you for your business. Please pay within 15 days.
+        </p>
+      </div>
+
+      <!-- Summary -->
+      <div class="w-full md:w-80 space-y-3">
+        <div class="flex justify-between text-gray-500">
+          <span>Subtotal</span>
+          <span>{{ currency }}{{ invoice.subtotal|default:invoice.total_amount }}</span>
+        </div>
+
+        <div class="flex justify-between text-gray-500">
+          <span>Tax (GST {{ invoice.tax_percent|default:"18" }}%)</span>
+          <span>{{ currency }}{{ invoice.tax_amount|default:"0.00" }}</span>
+        </div>
+
+        <div class="flex justify-between text-2xl font-black text-gray-900 border-t pt-3">
+          <span>Total</span>
+          <span class="text-blue-600">
+            {{ currency }}{{ invoice.total_amount }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-12 flex gap-4 print:hidden">
+      <button onclick="window.print()"
+        class="flex-1 bg-gray-900 text-white py-3 px-6 rounded-lg font-bold hover:bg-gray-800 transition">
+        Print Invoice
+      </button>
+
+      <button disabled
+        class="flex-1 bg-blue-300 text-white py-3 px-6 rounded-lg font-bold cursor-not-allowed">
+        Download PDF (Coming Soon)
+      </button>
+    </div>
+
+  </div>
+</div>
+
+{% endwith %}
+{% endblock %}

@@ -37,9 +37,11 @@
             <button class="btn btn-sm bg-white border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl px-4 text-[10px] font-black tracking-widest">
                 EXPORT
             </button>
-            <button class="btn btn-sm btn-primary bg-indigo-600 hover:bg-indigo-700 border-none text-white rounded-xl px-4 text-[10px] font-black tracking-widest shadow-lg shadow-indigo-100">
-                + NEW INVOICE
-            </button>
+<a href="{% url 'invoice_create' %}"
+   class="btn btn-sm bg-indigo-600 hover:bg-indigo-700 border-none text-white rounded-xl px-4 text-[10px] font-black tracking-widest shadow-lg shadow-indigo-100 inline-flex items-center">
+   + NEW INVOICE
+</a>
+
         </div>
     </div>
 
@@ -88,17 +90,14 @@
                         </td>
                         <td>
                             <div class="flex items-center gap-3">
-                                <div class="avatar placeholder">
-                                    <div class="bg-slate-900 text-white rounded-xl w-7 text-[9px] font-black shadow-inner uppercase">
-                                        <span>{{ invoice.customer|slice:":2" }}</span>
-                                    </div>
+                               
                                 </div>
                                 <span class="text-[12px] font-bold text-slate-800 tracking-tight">{{ invoice.customer }}</span>
                             </div>
                         </td>
                         <td>
                             <span class="text-[13px] font-black text-slate-900 tabular-nums tracking-tighter">
-                                ₹{{ invoice.invoice_amount }}
+                                ₹ {{ invoice.invoice_amount }}
                             </span>
                         </td>
                         <td class="text-center">
@@ -112,7 +111,7 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" /></svg>
                                 </label>
                                 <ul tabindex="0" class="dropdown-content z-[1] menu p-1 shadow-xl bg-white rounded-xl w-32 text-[10px] font-bold border border-slate-100">
-                                    <li><a>View Details</a></li>
+                                    <li><a  href="{% url 'invoice_detail' invoice.id %}">View Details</a></li>
                                     <li class="text-rose-500"><a>Cancel Bill</a></li>
                                 </ul>
                             </div>
@@ -130,4 +129,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock %}exit()
