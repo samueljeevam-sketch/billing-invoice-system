@@ -1,17 +1,30 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Sum
 from .models import Customer, Invoice, InvoiceItem, Product
+from django.db import transaction
+from decimal import Decimal
+
+
 
 
 def dashboard(request):
+    customer_count = Customer.objects.count()
+    invoice_count = Invoice.objects.count()
+
+    recent_invoices = (
+        Invoice.objects
+        .select_related("customer")
+        .order_by("-invoice_date")[:5]
+    )
+
     context = {
-        "customer_count": Customer.objects.count(),
-        "invoice_count": Invoice.objects.count(),
-        "total_amount": Invoice.objects.aggregate(
-            total=Sum("invoice_amount")
-        )["total"] or 0,
+        "customer_count": customer_count,
+        "invoice_count": invoice_count,
+        "recent_invoices": recent_invoices,
     }
+
     return render(request, "invoice/dashboard.html", context)
+ 
 
 
 def invoice_list(request):
@@ -21,63 +34,66 @@ def invoice_list(request):
     })
 
 
-def invoice_create(request):
-    customers = Customer.objects.all()
-    products = Product.objects.all()   
 
+
+
+def invoice_create(request):
     if request.method == "POST":
         customer_id = request.POST.get("customer")
-        invoice_date = request.POST.get("invoice_date")
-        
 
-        items_data = request.POST.getlist("product[]")
-        quantities = request.POST.getlist("qty[]")
-        prices = request.POST.getlist("price[]")
-        customer = Customer.objects.get(id=customer_id)
-
-        # ✅ STORE the created invoice
         invoice = Invoice.objects.create(
-            customer=customer,
-            invoice_date=invoice_date,
-            invoice_amount=0  # Temporary, will update later
+            customer_id=customer_id
         )
 
-        total_amount = 0
+        products = request.POST.getlist("product[]")
+        quantities = request.POST.getlist("quantity[]")
 
-        for item, quantity, price in zip(items_data, quantities, prices):
-            quantity = int(quantity)
-            price = float(price)
-            amount = quantity * price
+        for product_id, qty in zip(products, quantities):
+            if not product_id or not qty:
+                continue
 
             InvoiceItem.objects.create(
                 invoice=invoice,
-                description=item,
-                quantity=quantity,
-                unit_price=price,
-                amount=amount,
+                product_id=product_id,
+                quantity=int(qty)
             )
 
-            total_amount += amount
+        # ✅ DO NOT SET invoice_amount HERE
+        # Model handles it automatically
 
-        # ✅ update invoice total
-        invoice.invoice_amount = total_amount
-        invoice.save()
+        return redirect("invoice_success", pk=invoice.id)
 
-        return render(request, "invoice/invoice_success.html", {
-            "invoice": invoice
-        })
-
-    # ✅ send customers to template
     return render(request, "invoice/new_invoice.html", {
-        "customers": customers,
-        "products": products
+        "products": Product.objects.all(),
+        "customers": Customer.objects.all(),
     })
+
+
 
 
 def invoice_detail(request, pk):
     invoice = get_object_or_404(Invoice, pk=pk)
-    items = InvoiceItem.objects.filter(invoice=invoice)
-    return render(request, "invoice/invoice_detail.html", {
+    items = invoice.items.all()
+
+    subtotal = items.aggregate(
+        total=Sum("price")
+    )["total"] or 0
+
+    gst = items.aggregate(
+        total=Sum("gst_amount")
+    )["total"] or 0
+
+    total = subtotal + gst 
+
+    return render(request, "invoice/invoicedetails.html", {
         "invoice": invoice,
-        "items": items
+        "items": items,
+        "subtotal": subtotal,
+        "gst": gst,
+    })
+
+def invoice_success(request, pk):
+    invoice = get_object_or_404(Invoice, pk=pk)
+    return render(request, "invoice/invoice_success.html", {
+        "invoice": invoice
     })

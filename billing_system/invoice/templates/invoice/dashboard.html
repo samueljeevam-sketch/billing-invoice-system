@@ -20,6 +20,7 @@
 {% block content %}
 <div class="min-h-screen p-6 lg:p-10">
 
+    <!-- Header -->
     <header class="flex flex-row justify-between items-center mb-8 pb-6 border-b border-slate-200">
         <div class="flex items-center gap-4">
             <h1 class="text-xl font-black text-slate-900 tracking-tight">
@@ -30,129 +31,146 @@
                 Jan 2026 Cycle
             </p>
         </div>
-
-        <div class="flex items-center gap-2">
-            <button class="btn btn-sm btn-ghost text-slate-500 text-[10px] font-bold tracking-widest uppercase">
-                Export
-            </button>
-           <button
-    class="bg-white border border-indigo-300
-           text-indigo-600 px-5 py-2 rounded-xl
-           text-xs font-black
-           shadow-sm hover:bg-indigo-50
-           flex items-center gap-2 transition">
-    <svg xmlns="http://www.w3.org/2000/svg"
-         class="h-3.5 w-3.5"
-         fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-              d="M12 4v16m8-8H4" />
-    </svg>
-    <span>New Invoice</span>
-</button>
-
-        </div>
     </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition">
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
+
+        <!-- Customers -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm
+                    hover:shadow-md hover:-translate-y-0.5 transition-all">
             <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Customers</p>
             <h3 class="text-xl font-black text-slate-900 tracking-tight">{{ customer_count }}</h3>
-            <div class="mt-2 inline-flex items-center text-emerald-600 font-bold text-[8px] bg-emerald-50 px-2 py-0.5 rounded-lg">
+            <div class="mt-2 inline-flex items-center text-emerald-600 font-bold text-[8px]
+                        bg-emerald-50 px-2 py-0.5 rounded-lg">
                 ↗ 12.5%
             </div>
         </div>
 
-        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+        <!-- Invoices -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm
+                    hover:shadow-md hover:-translate-y-0.5 transition-all">
             <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Invoices</p>
             <h3 class="text-xl font-black text-slate-900 tracking-tight">{{ invoice_count }}</h3>
             <div class="mt-4 h-1 w-full bg-slate-100 rounded-full overflow-hidden">
-                <div class="h-full bg-indigo-500 w-[35%] rounded-full"></div>
+                <div class="h-full bg-gradient-to-r from-emerald-500 to-indigo-500 w-[35%] rounded-full"></div>
             </div>
         </div>
 
-        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
-            <p class="text-[9px] font-black text-amber-500 uppercase tracking-widest mb-1">Pending</p>
-            <div class="flex items-center justify-between">
-                <h3 class="text-xl font-black text-amber-600">{{ paid_count }}</h3>
-                <div class="h-5 w-5 rounded-lg bg-amber-500 text-[7px] text-white flex items-center justify-center font-bold">+9</div>
-            </div>
-        </div>
+        <!-- All Invoices Action Card -->
+        <!-- All Invoices Action Card (VISIBLE + CLICKABLE) -->
+<a href="{% url 'invoice_list' %}"
+   class="group relative bg-indigo-600
+          p-5 rounded-3xl
+          shadow-xl shadow-indigo-300
+          flex flex-col justify-between
+          text-white
+          hover:bg-indigo-700
+          hover:-translate-y-1
+          hover:shadow-2xl
+          transition-all">
 
-        <div class="bg-slate-900 p-5 rounded-3xl shadow-xl shadow-slate-200 text-white">
-            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 text-opacity-70">Avg. Payment</p>
-            <h3 class="text-xl font-black italic">4.2 <span class="text-indigo-400 not-italic text-[10px] uppercase">Days</span></h3>
-        </div>
-    </div>
-
-    <div class="mb-6">
-        <a href="{% url 'invoice_list' %}"
-           class="group inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 text-indigo-600 font-bold text-[9px] uppercase tracking-widest rounded-xl hover:bg-indigo-50 transition-all">
+    <div>
+        <p class="text-[9px] font-bold uppercase tracking-widest text-indigo-200">
+            Invoices
+        </p>
+        <h3 class="text-lg font-black mt-2">
             View All Invoices
-            <span class="transform group-hover:translate-x-1 transition-transform">→</span>
-        </a>
+        </h3>
     </div>
 
+    <div class="mt-6 text-[10px] font-bold uppercase tracking-widest
+                text-white/90 flex items-center gap-1">
+        Open Ledger
+        <span class="group-hover:translate-x-1 transition-transform">→</span>
+    </div>
+</a>
+
+
+    </div>
+
+    <!-- Recent Activity -->
     <div class="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
-        
-        <div class="px-6 py-4 bg-slate-50/50 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+
+        <div class="px-6 py-4 bg-slate-50/50 border-b border-slate-200
+                    flex flex-col sm:flex-row justify-between items-center gap-4">
             <h2 class="text-sm font-black text-slate-800 tracking-tight">Recent Activity</h2>
-            
+
             <div class="flex items-center gap-2">
                 <div class="relative">
                     <input type="text" placeholder="Search..."
-                           class="w-40 bg-white border border-slate-200 rounded-lg py-1.5 pl-8 pr-3 text-[10px] focus:w-56 focus:ring-2 ring-indigo-100 transition-all outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 absolute left-2.5 top-2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                           class="w-40 bg-white border border-slate-200 rounded-lg
+                                  py-1.5 pl-8 pr-3 text-[10px]
+                                  focus:w-56 focus:ring-2 ring-indigo-200
+                                  transition-all outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="h-3 w-3 absolute left-2.5 top-2 text-slate-400"
+                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
                 </div>
-                <select class="select select-bordered select-xs rounded-lg text-[10px] font-bold h-8">
-                    <option disabled selected>Status</option>
-                    <option>Paid</option>
-                    <option>Pending</option>
-                </select>
             </div>
         </div>
 
         <div class="overflow-x-auto">
             <table class="table w-full border-none">
                 <thead>
-                    <tr class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100">
-                        <th class="px-8 py-4 bg-transparent">Reference</th>
-                        <th class="py-4 bg-transparent">Customer</th>
-                        <th class="py-4 text-center bg-transparent">Status</th>
-                        <th class="py-4 text-right pr-10 bg-transparent">Amount</th>
+                    <tr class="text-[9px] font-black uppercase tracking-[0.2em]
+                               text-slate-400 border-b border-slate-100">
+                        <th class="px-8 py-4">Reference</th>
+                        <th class="py-4">Customer</th>
+                        <th class="py-4 text-center">Status</th>
+                        <th class="py-4 text-right pr-10">Amount</th>
                     </tr>
                 </thead>
 
-                <tbody class="divide-y divide-slate-50">
-                    <tr class="group hover:bg-slate-50 transition-colors">
-                        <td class="px-8 py-4">
-                            <span class="font-mono-custom text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">
-                                #INV-99201
-                            </span>
-                        </td>
-                        <td class="py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="avatar placeholder">
-                                    <div class="bg-slate-900 text-white rounded-lg w-7 h-7 text-[9px] font-black">
-                                        RK
-                                    </div>
-                                </div>
-                                <span class="text-[12px] font-bold text-slate-700 tracking-tight">Rishi Kumar</span>
-                            </div>
-                        </td>
-                        <td class="py-4 text-center">
-                            <span class="badge badge-sm bg-emerald-50 text-emerald-600 text-[8px] font-black border-none py-2 px-2">
-                                PAID
-                            </span>
-                        </td>
-                        <td class="py-4 text-right pr-10 font-black text-slate-900 text-sm tabular-nums">
-                            ₹ 5,200.00
-                        </td>
-                    </tr>
-                </tbody>
+               <tbody class="divide-y divide-slate-50">
+{% for invoice in recent_invoices %}
+<tr class="hover:bg-slate-50 transition">
+
+    <!-- Reference -->
+    <td class="px-8 py-4">
+        <span class="font-mono-custom text-[10px] font-bold
+                     text-indigo-600 bg-indigo-50
+                     px-2 py-0.5 rounded-md">
+            #INV-{{ invoice.id }}
+        </span>
+    </td>
+
+    <!-- Customer -->
+    <td class="py-4 font-bold text-slate-700">
+        {{ invoice.customer.name }}
+    </td>
+
+    <!-- Status (temporary) -->
+    <td class="py-4 text-center">
+        <span class="bg-amber-50 text-amber-600
+                     text-[8px] font-black px-2 py-1 rounded-md">
+            PENDING
+        </span>
+    </td>
+
+    <!-- Amount -->
+    <td class="py-4 text-right pr-10 font-black text-slate-900">
+        ₹ {{ invoice.invoice_amount }}
+    </td>
+
+</tr>
+{% empty %}
+<tr>
+    <td colspan="4" class="text-center py-10 text-slate-400 text-sm">
+        No recent invoices found.
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+
+
             </table>
         </div>
+
     </div>
+
 </div>
 {% endblock %}
