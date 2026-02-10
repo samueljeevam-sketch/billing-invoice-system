@@ -8,18 +8,18 @@
     <style>
 @media print {
 
-    /* Hide EVERYTHING */
+    
     body * {
         visibility: hidden !important;
     }
 
-    /* Show ONLY invoice */
+    
     .invoice-wrapper,
     .invoice-wrapper * {
         visibility: visible !important;
     }
 
-    /* Kill dashboard layout */
+    
     body,
     html {
         height: auto !important;
@@ -28,7 +28,7 @@
         background: #fff !important;
     }
 
-    /* Remove flex & sidebar influence */
+    
     .flex,
     aside,
     nav,
@@ -36,7 +36,7 @@
         display: block !important;
     }
 
-    /* Position invoice cleanly */
+    
     .invoice-wrapper {
         position: absolute;
         inset: 0;
@@ -45,7 +45,7 @@
         padding: 0 !important;
     }
 
-    /* Remove buttons & UI */
+    
     button,
     .action-bar,
     .no-print,

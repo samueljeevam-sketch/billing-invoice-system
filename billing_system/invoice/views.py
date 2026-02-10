@@ -58,8 +58,7 @@ def invoice_create(request):
                 quantity=int(qty)
             )
 
-        # ✅ DO NOT SET invoice_amount HERE
-        # Model handles it automatically
+
 
         return redirect("invoice_success", pk=invoice.id)
 
