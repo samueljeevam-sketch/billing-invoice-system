@@ -1,8 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Sum
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField
 from .models import Customer, Invoice, InvoiceItem, Product
 from django.db import transaction
 from decimal import Decimal
+from django.contrib import messages
+from django.core.exceptions import ValidationError
 
 
 
@@ -17,56 +19,96 @@ def dashboard(request):
         .order_by("-invoice_date")[:5]
     )
 
+    # 🔹 Total Revenue (All invoices)
+    total_revenue = Invoice.objects.aggregate(
+        total=Sum("invoice_amount")
+    )["total"] or 0
+
+    # 🔹 Inventory Value (price × stock)
+    inventory_value_expression = ExpressionWrapper(
+        F("price") * F("stock"),
+        output_field=DecimalField()
+    )
+
+    inventory_value = Product.objects.aggregate(
+        total=Sum(inventory_value_expression)
+    )["total"] or 0
+
+    # 🔹 Inventory Stats
+    product_count = Product.objects.count()
+    low_stock_threshold = 5
+    low_stock_products = Product.objects.filter(stock__lte=low_stock_threshold)
+    low_stock_count = low_stock_products.count()
+
+    lowest_item = low_stock_products.order_by('stock').first()
+    lowest_stock_product_name = lowest_item.name if lowest_item else "All Clear"
+
     context = {
         "customer_count": customer_count,
         "invoice_count": invoice_count,
         "recent_invoices": recent_invoices,
+        "total_revenue": total_revenue,
+        "inventory_value": inventory_value,
+        "product_count": product_count,
+        "low_stock_count": low_stock_count,
+        "lowest_stock_product_name": lowest_stock_product_name,
     }
 
     return render(request, "invoice/dashboard.html", context)
+
  
 
 
 def invoice_list(request):
     invoices = Invoice.objects.select_related("customer").order_by("-id")
-    return render(request, "invoice/invoice_list.html", {
+    return render(request, "invoice/invoice/invoice_list.html", {
         "invoices": invoices
     })
 
 
 
 
-
 def invoice_create(request):
+    customers = Customer.objects.all()
+    products = Product.objects.all()
+
     if request.method == "POST":
         customer_id = request.POST.get("customer")
-
-        invoice = Invoice.objects.create(
-            customer_id=customer_id
-        )
-
-        products = request.POST.getlist("product[]")
+        product_ids = request.POST.getlist("product[]")
         quantities = request.POST.getlist("quantity[]")
 
-        for product_id, qty in zip(products, quantities):
-            if not product_id or not qty:
-                continue
+        try:
+            with transaction.atomic():
 
-            InvoiceItem.objects.create(
-                invoice=invoice,
-                product_id=product_id,
-                quantity=int(qty)
-            )
+                invoice = Invoice.objects.create(
+                    customer_id=customer_id
+                )
 
+                for product_id, qty in zip(product_ids, quantities):
+                    if not product_id or not qty:
+                        continue
 
+                    product = Product.objects.get(id=product_id)
+                    quantity = int(qty)
 
-        return redirect("invoice_success", pk=invoice.id)
+                    item = InvoiceItem(
+                        invoice=invoice,
+                        product=product,
+                        quantity=quantity
+                    )
 
-    return render(request, "invoice/new_invoice.html", {
-        "products": Product.objects.all(),
-        "customers": Customer.objects.all(),
+                    item.save()  # triggers stock validation
+
+            # 🔥 No success message
+            return redirect("invoice_success", pk=invoice.id)
+
+        except ValidationError as e:
+            messages.error(request, e.message)
+
+    return render(request, "invoice/invoice/new_invoice.html", {
+        "customers": customers,
+        "products": products
     })
-
 
 
 
@@ -74,25 +116,71 @@ def invoice_detail(request, pk):
     invoice = get_object_or_404(Invoice, pk=pk)
     items = invoice.items.all()
 
-    subtotal = items.aggregate(
-        total=Sum("price")
-    )["total"] or 0
+    totals = items.aggregate(
+        subtotal=Sum("price"),
+        gst=Sum("gst_amount")
+    )
 
-    gst = items.aggregate(
-        total=Sum("gst_amount")
-    )["total"] or 0
+    subtotal = totals["subtotal"] or 0
+    gst = totals["gst"] or 0
+    total = subtotal + gst
 
-    total = subtotal + gst 
-
-    return render(request, "invoice/invoicedetails.html", {
+    return render(request, "invoice/invoice/invoicedetails.html", {
         "invoice": invoice,
         "items": items,
         "subtotal": subtotal,
         "gst": gst,
+        "total": total,
     })
 
 def invoice_success(request, pk):
     invoice = get_object_or_404(Invoice, pk=pk)
-    return render(request, "invoice/invoice_success.html", {
+    return render(request, "invoice/invoice/invoice_success.html", {
         "invoice": invoice
     })
+
+def product_list(request):
+    products = Product.objects.all()
+    return render(request, "invoice/product/product_list.html", {"products": products})
+
+def product_edit(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+
+    if request.method == "POST":
+        product.name = request.POST.get("name")
+
+        product.price = Decimal(request.POST.get("price") or 0)
+        product.gst_percent = Decimal(request.POST.get("gst_percent") or 0)
+        product.stock = int(request.POST.get("stock") or 0)
+
+        product.save()
+        return redirect("product_list")
+
+    return redirect("product_list")
+
+def product_delete(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+
+    if request.method == "POST":
+        product.delete()
+        return redirect("product_list")
+
+    return redirect("product_list")
+
+def product_create(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        price = request.POST.get("price")
+        gst_percent = request.POST.get("gst_percent")
+        stock = request.POST.get("stock")
+
+        Product.objects.create(
+            name=name,
+            price=price,
+            gst_percent=gst_percent,
+            stock=stock
+        )
+
+        return redirect("product_list")
+
+    return redirect("product_list")

@@ -1,176 +1,96 @@
 {% extends "base.html" %}
 
-{% block title %}BillingPro | Dashboard{% endblock %}
+{% block title %}PrimeLedger | Intelligence Dashboard{% endblock %}
 
 {% block extra_head %}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-
 <style>
-    body { 
-        font-family: 'Plus Jakarta Sans', sans-serif; 
-        background-color: #F8FAFC;
-        -webkit-font-smoothing: antialiased;
+    .dashboard-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .dashboard-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); }
+    .text-gradient {
+        background: linear-gradient(135deg, #1e293b 0%, #4f46e5 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
-    .font-mono-custom { font-family: 'JetBrains Mono', monospace; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen p-6 lg:p-10">
+<div class="max-w-7xl mx-auto px-6 py-4">
 
-    <!-- Header -->
-    <header class="flex flex-row justify-between items-center mb-8 pb-6 border-b border-slate-200">
-        <div class="flex items-center gap-4">
-            <h1 class="text-xl font-black text-slate-900 tracking-tight">
-                Financial <span class="text-indigo-600">Overview</span>
-            </h1>
-            <span class="hidden md:inline-block h-4 w-[1px] bg-slate-300"></span>
-            <p class="hidden md:block text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">
-                Jan 2026 Cycle
-            </p>
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="w-2 h-2 bg-indigo-600 rounded-full animate-pulse"></span>
+                <span class="text-indigo-600 text-[10px] font-black uppercase tracking-[0.3em]">System Live</span>
+            </div>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Intelligence Dashboard</h1>
         </div>
+        <p class="text-[10px] text-slate-500 font-extrabold uppercase tracking-widest bg-slate-100 px-4 py-2 rounded-xl border border-slate-200">
+            Cycle: <span class="text-indigo-600">FEB 2026</span>
+        </p>
     </header>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+        <div class="lg:col-span-2 dashboard-card bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/30 flex flex-col justify-between relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-6 opacity-5"><i data-lucide="trending-up" class="w-24 h-24"></i></div>
+            <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Gross Revenue Flow</p>
+                <h3 class="text-4xl font-black text-gradient tracking-tighter">₹{{ total_revenue|floatformat:2 }}</h3>
+            </div>
+            <div class="mt-4"><span class="text-slate-400 text-[10px] font-medium italic">Verified by PrimeLedger</span></div>
+        </div>
 
-        <!-- Customers -->
-        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm
-                    hover:shadow-md hover:-translate-y-0.5 transition-all">
-            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Customers</p>
-            <h3 class="text-xl font-black text-slate-900 tracking-tight">{{ customer_count }}</h3>
-            <div class="mt-2 inline-flex items-center text-emerald-600 font-bold text-[8px]
-                        bg-emerald-50 px-2 py-0.5 rounded-lg">
-                ↗ 12.5%
+        <div class="lg:col-span-2 dashboard-card bg-slate-900 p-6 rounded-[2.5rem] shadow-2xl shadow-slate-900/20 text-white flex flex-col justify-center relative overflow-hidden">
+             <div class="absolute top-0 right-0 p-6 opacity-10"><i data-lucide="shield-check" class="w-20 h-20 text-indigo-500"></i></div>
+             <div>
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2 text-indigo-400">Total Inventory Value</p>
+                <h3 class="text-4xl font-black tracking-tighter mb-1">₹{{ inventory_value|floatformat:2 }}</h3>
+                <p class="text-slate-400 text-[10px] font-medium opacity-70">Net valuation of SKU assets in circulation.</p>
             </div>
         </div>
+    </div>
 
-        <!-- Invoices -->
-        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm
-                    hover:shadow-md hover:-translate-y-0.5 transition-all">
-            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Invoices</p>
-            <h3 class="text-xl font-black text-slate-900 tracking-tight">{{ invoice_count }}</h3>
-            <div class="mt-4 h-1 w-full bg-slate-100 rounded-full overflow-hidden">
-                <div class="h-full bg-gradient-to-r from-emerald-500 to-indigo-500 w-[35%] rounded-full"></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div class="dashboard-card bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-lg shadow-slate-200/40">
+            <div class="p-3 bg-indigo-50 w-fit rounded-2xl mb-4"><i data-lucide="users" class="w-5 h-5 text-indigo-600"></i></div>
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Clients</p>
+            <h3 class="text-3xl font-black text-slate-900 tracking-tighter mt-1">{{ customer_count }}</h3>
+        </div>
+
+        <div class="dashboard-card bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-lg shadow-slate-200/40">
+            <div class="p-3 bg-slate-50 w-fit rounded-2xl mb-4"><i data-lucide="file-text" class="w-5 h-5 text-slate-400"></i></div>
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Pending Invoices</p>
+            <h3 class="text-3xl font-black text-slate-900 tracking-tighter mt-1">{{ invoice_count }}</h3>
+        </div>
+
+        <div class="dashboard-card bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-lg shadow-slate-200/40">
+            <div class="p-3 bg-slate-50 w-fit rounded-2xl mb-4"><i data-lucide="package" class="w-5 h-5 text-slate-400"></i></div>
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">SKU Catalog</p>
+            <h3 class="text-3xl font-black text-slate-900 tracking-tighter mt-1">{{ product_count }}</h3>
+        </div>
+
+        <div class="dashboard-card bg-orange-50 p-6 rounded-[2.5rem] border border-orange-100 shadow-lg shadow-orange-200/20">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-3 bg-white rounded-2xl border border-orange-100"><i data-lucide="alert-circle" class="w-5 h-5 text-orange-600"></i></div>
+                <span class="w-2 h-2 bg-orange-500 rounded-full animate-ping mt-2"></span>
             </div>
+            <p class="text-[9px] font-black text-orange-600/60 uppercase tracking-widest">Critical Alert</p>
+            <h3 class="text-3xl font-black text-orange-700 tracking-tighter mt-1">{{ low_stock_count }}</h3>
+            <p class="text-[9px] font-bold text-orange-600 mt-1 uppercase truncate">Refill: <span class="font-black underline">{{ lowest_stock_product_name|default:"None" }}</span></p>
         </div>
-
-        <!-- All Invoices Action Card -->
-        <!-- All Invoices Action Card (VISIBLE + CLICKABLE) -->
-<a href="{% url 'invoice_list' %}"
-   class="group relative bg-indigo-600
-          p-5 rounded-3xl
-          shadow-xl shadow-indigo-300
-          flex flex-col justify-between
-          text-white
-          hover:bg-indigo-700
-          hover:-translate-y-1
-          hover:shadow-2xl
-          transition-all">
-
-    <div>
-        <p class="text-[9px] font-bold uppercase tracking-widest text-indigo-200">
-            Invoices
-        </p>
-        <h3 class="text-lg font-black mt-2">
-            View All Invoices
-        </h3>
     </div>
 
-    <div class="mt-6 text-[10px] font-bold uppercase tracking-widest
-                text-white/90 flex items-center gap-1">
-        Open Ledger
-        <span class="group-hover:translate-x-1 transition-transform">→</span>
-    </div>
-</a>
-
-
-    </div>
-
-    <!-- Recent Activity -->
-    <div class="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
-
-        <div class="px-6 py-4 bg-slate-50/50 border-b border-slate-200
-                    flex flex-col sm:flex-row justify-between items-center gap-4">
-            <h2 class="text-sm font-black text-slate-800 tracking-tight">Recent Activity</h2>
-
-            <div class="flex items-center gap-2">
-                <div class="relative">
-                    <input type="text" placeholder="Search..."
-                           class="w-40 bg-white border border-slate-200 rounded-lg
-                                  py-1.5 pl-8 pr-3 text-[10px]
-                                  focus:w-56 focus:ring-2 ring-indigo-200
-                                  transition-all outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         class="h-3 w-3 absolute left-2.5 top-2 text-slate-400"
-                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                </div>
+    <div class="mb-10">
+        <a href="{% url 'invoice_list' %}" class="group relative bg-indigo-600 p-6 rounded-[2.5rem] shadow-2xl flex items-center justify-between text-white transition-all hover:bg-indigo-700 overflow-hidden">
+            <div class="relative z-10 flex items-center gap-6">
+                <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md"><i data-lucide="layout-grid" class="w-6 h-6"></i></div>
+                <h3 class="text-xl font-black tracking-tight">Access Enterprise Ledger Management</h3>
             </div>
-        </div>
-
-        <div class="overflow-x-auto">
-            <table class="table w-full border-none">
-                <thead>
-                    <tr class="text-[9px] font-black uppercase tracking-[0.2em]
-                               text-slate-400 border-b border-slate-100">
-                        <th class="px-8 py-4">Reference</th>
-                        <th class="py-4">Customer</th>
-                        <th class="py-4 text-center">Status</th>
-                        <th class="py-4 text-right pr-10">Amount</th>
-                    </tr>
-                </thead>
-
-               <tbody class="divide-y divide-slate-50">
-{% for invoice in recent_invoices %}
-<tr class="hover:bg-slate-50 transition">
-
-    <!-- Reference -->
-    <td class="px-8 py-4">
-        <span class="font-mono-custom text-[10px] font-bold
-                     text-indigo-600 bg-indigo-50
-                     px-2 py-0.5 rounded-md">
-            #INV-{{ invoice.id }}
-        </span>
-    </td>
-
-    <!-- Customer -->
-    <td class="py-4 font-bold text-slate-700">
-        {{ invoice.customer.name }}
-    </td>
-
-    <!-- Status (temporary) -->
-    <td class="py-4 text-center">
-        <span class="bg-amber-50 text-amber-600
-                     text-[8px] font-black px-2 py-1 rounded-md">
-            PENDING
-        </span>
-    </td>
-
-    <!-- Amount -->
-    <td class="py-4 text-right pr-10 font-black text-slate-900">
-        ₹ {{ invoice.invoice_amount }}
-    </td>
-
-</tr>
-{% empty %}
-<tr>
-    <td colspan="4" class="text-center py-10 text-slate-400 text-sm">
-        No recent invoices found.
-    </td>
-</tr>
-{% endfor %}
-</tbody>
-
-
-            </table>
-        </div>
-
+            <div class="relative z-10 bg-white px-5 py-3 rounded-xl text-indigo-600 font-black text-[10px] uppercase tracking-widest flex items-center gap-2">Launch System <i data-lucide="chevron-right" class="w-4 h-4"></i></div>
+        </a>
     </div>
 
 </div>
+
+<script>lucide.createIcons();</script>
 {% endblock %}

@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory | PrimeLedger{% endblock %}
+
+{% block content %}
+<div class="p-8 max-w-7xl mx-auto min-h-screen">
+
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
+        <div>
+            <div class="flex items-center gap-3">
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Products</h1>
+                <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-full border border-indigo-200">
+                    {{ products|length }} Total
+                </span>
+            </div>
+            <p class="text-slate-500 mt-1">Manage your inventory, pricing, and tax configurations in real-time.</p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3">
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </span>
+                <input type="text" id="tableSearch" placeholder="Search products..." 
+                       class="pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition w-full sm:w-64 bg-white shadow-sm">
+            </div>
+
+            <button onclick="openAddModal()"
+               class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-indigo-200 font-semibold transition duration-200 active:scale-95">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                Add Product
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead>
+                    <tr class="bg-slate-50/50">
+                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">Product Details</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">Pricing</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">Tax (GST)</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">Inventory</th>
+                        <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-widest">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody class="divide-y divide-slate-100">
+                    {% for product in products %}
+                    <tr class="hover:bg-indigo-50/30 transition-all group">
+                        <td class="px-6 py-5 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-bold shadow-sm">
+                                    {{ product.name|slice:":1"|upper }}
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-bold text-slate-900">{{ product.name }}</div>
+                                    <div class="text-xs text-slate-400 font-medium">SKU-{{ product.id|stringformat:"04d" }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-5 whitespace-nowrap">
+                            <span class="text-sm font-semibold text-slate-700">₹{{ product.price }}</span>
+                        </td>
+                        <td class="px-6 py-5 whitespace-nowrap">
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                {{ product.gst_percent }}%
+                            </span>
+                        </td>
+                        <td class="px-6 py-5 whitespace-nowrap">
+                            {% if product.stock > 10 %}
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
+                                    {{ product.stock }} In Stock
+                                </span>
+                            {% elif product.stock > 0 %}
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-100">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-2"></span>
+                                    Low Stock ({{ product.stock }})
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-100">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500 mr-2"></span>
+                                    Out of Stock
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-5 whitespace-nowrap text-right text-sm font-medium">
+                            <div class="flex justify-end items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onclick="openEditModal('{{ product.id }}', '{{ product.name|escapejs }}', '{{ product.price }}', '{{ product.gst_percent }}', '{{ product.stock }}')"
+                                        class="p-2 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors" title="Edit Product">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                </button>
+                                <button onclick="openDeleteModal('{{ product.id }}')"
+                                        class="p-2 text-rose-600 hover:bg-rose-100 rounded-lg transition-colors" title="Delete Product">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-20 text-center">
+                            <div class="flex flex-col items-center">
+                                <div class="bg-slate-50 p-6 rounded-full mb-4">
+                                    <svg class="w-16 h-16 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900">Your inventory is empty</h3>
+                                <p class="text-slate-500 mt-2 max-w-xs mx-auto">Add your first product to start generating professional invoices today.</p>
+                                <button onclick="openAddModal()" class="mt-6 text-indigo-600 font-bold hover:underline">Add product now &rarr;</button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="productModal" class="fixed inset-0 bg-slate-900/40 hidden items-center justify-center z-50 backdrop-blur-[2px] p-4">
+    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden transform transition-all">
+        <div class="bg-slate-50 px-8 py-6 border-b border-slate-100 flex justify-between items-center">
+            <div>
+                <h2 id="modalTitle" class="text-2xl font-bold text-slate-900">Add Product</h2>
+                <p class="text-sm text-slate-500">Enter product details below</p>
+            </div>
+            <button onclick="closeModal('productModal')" class="bg-white border border-slate-200 p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:shadow-sm transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+
+        <form method="POST" id="productForm" class="p-8 space-y-5">
+            {% csrf_token %}
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Product Name</label>
+                <input type="text" name="name" id="pName" required placeholder="e.g. Wireless Mouse"
+                       class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Base Price (₹)</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-3 text-slate-400">₹</span>
+                        <input type="number" step="0.01" name="price" id="pPrice" required placeholder="0.00"
+                               class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">GST Rate (%)</label>
+                    <select name="gst_percent" id="pGST" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition appearance-none">
+                        <option value="0">0% (Exempt)</option>
+                        <option value="5">5%</option>
+                        <option value="12">12%</option>
+                        <option value="18">18%</option>
+                        <option value="28">28%</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Stock Quantity</label>
+                <input type="number" name="stock" id="pStock" required placeholder="0"
+                       class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition">
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button type="button" onclick="closeModal('productModal')"
+                        class="flex-1 px-5 py-3 text-slate-700 font-bold hover:bg-slate-100 rounded-xl transition">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="flex-1 px-5 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition active:scale-95">
+                    Confirm & Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="deleteModal" class="fixed inset-0 bg-slate-900/40 hidden items-center justify-center z-50 backdrop-blur-[2px] p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl text-center">
+        <div class="w-20 h-20 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-rose-100">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+        </div>
+        <h2 class="text-2xl font-black text-slate-900 mb-2">Are you sure?</h2>
+        <p class="text-slate-500 mb-8">This will permanently delete this product. You cannot undo this action.</p>
+        
+        <form method="POST" id="deleteForm" class="flex flex-col gap-3">
+            {% csrf_token %}
+            <button type="submit" class="w-full py-4 bg-rose-600 text-white font-bold rounded-2xl hover:bg-rose-700 shadow-lg shadow-rose-100 transition active:scale-95">
+                Yes, Delete Product
+            </button>
+            <button type="button" onclick="closeModal('deleteModal')" class="w-full py-3 text-slate-500 font-bold hover:text-slate-700 transition">
+                No, Keep it
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const productModal = document.getElementById("productModal");
+    const deleteModal = document.getElementById("deleteModal");
+
+    function openModal(modal) {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        // Animate modal entry
+        modal.firstElementChild.classList.add('scale-100', 'opacity-100');
+    }
+
+    function closeModal(id) {
+        const m = document.getElementById(id);
+        m.classList.add("hidden");
+        m.classList.remove("flex");
+    }
+
+    function openAddModal() {
+        document.getElementById("modalTitle").innerText = "New Product";
+        document.getElementById("productForm").action = "{% url 'product_create' %}";
+        document.getElementById("productForm").reset();
+        openModal(productModal);
+    }
+
+    function openEditModal(id, name, price, gst, stock) {
+        document.getElementById("modalTitle").innerText = "Update Product";
+        document.getElementById("pName").value = name;
+        document.getElementById("pPrice").value = price;
+        document.getElementById("pGST").value = gst;
+        document.getElementById("pStock").value = stock;
+
+        document.getElementById("productForm").action = "/products/edit/" + id + "/";
+        openModal(productModal);
+    }
+
+    function openDeleteModal(id) {
+        document.getElementById("deleteForm").action = "/products/delete/" + id + "/";
+        openModal(deleteModal);
+    }
+
+    // Close on backdrop click
+    window.onclick = function(event) {
+        if (event.target == productModal) closeModal('productModal');
+        if (event.target == deleteModal) closeModal('deleteModal');
+    }
+
+    const searchInput = document.getElementById("tableSearch");
+
+    searchInput.addEventListener("keyup", function () {
+        const filter = searchInput.value.toLowerCase();
+        const rows = document.querySelectorAll("tbody tr");
+
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+
+            if (text.includes(filter)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    });
+</script>
+
+{% endblock %}

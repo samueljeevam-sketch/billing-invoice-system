@@ -1,6 +1,7 @@
 from decimal import Decimal
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 
 class Customer(models.Model):
@@ -21,6 +22,9 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+    @property
+    def price_with_gst(self):
+        return self.price + (self.price * self.gst_percent / 100)
 
 
 class Invoice(models.Model):
@@ -29,9 +33,12 @@ class Invoice(models.Model):
     invoice_amount = models.DecimalField(
         max_digits=12, decimal_places=2, default=Decimal("0.00")
     )
+    gst_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=12.00)
 
     def __str__(self):
         return f"Invoice #{self.id}"
+    
+    created_at = models.DateTimeField(default=timezone.now)
 
 
 class InvoiceItem(models.Model):
@@ -81,3 +88,9 @@ class InvoiceItem(models.Model):
 
     def __str__(self):
         return f"{self.product.name} x {self.quantity}"
+    
+    @property
+    def total_price(self):
+        return self.quantity * self.price
+    
+
