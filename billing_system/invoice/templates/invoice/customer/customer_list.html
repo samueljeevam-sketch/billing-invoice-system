@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Client Ledger | PrimeLedger{% endblock %}
+
+{% block content %}
+<style>
+    /* Premium Tactical Input Styling */
+    .tactical-input {
+        width: 100%;
+        background-color: #f8fafc;
+        border: 1px solid #f1f5f9;
+        border-radius: 0.75rem;
+        padding: 0.65rem 1rem;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        color: #1e293b;
+        outline: none;
+        transition: all 0.2s ease;
+    }
+
+    .tactical-input:focus {
+        background-color: #ffffff;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.05);
+    }
+
+    .tactical-label {
+        display: block;
+        font-size: 9px;
+        font-weight: 900;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        margin-bottom: 0.4rem;
+        margin-left: 0.2rem;
+    }
+
+    /* Modal Animations */
+    @keyframes modalIn {
+        from { opacity: 0; transform: scale(0.95) translateY(10px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-animate { animation: modalIn 0.2s cubic-bezier(0.2, 1, 0.3, 1); }
+</style>
+
+<div class="p-6 lg:p-10 max-w-[1600px] mx-auto min-h-screen">
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
+        <div>
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-1.5 h-6 bg-indigo-600 rounded-full"></div>
+                <h1 class="text-3xl font-black text-slate-900 tracking-tighter uppercase italic">Client Registry</h1>
+            </div>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em] ml-5">Customer Details</p>
+        </div>
+
+        <button onclick="openClientModal()" class="bg-[#0f121d] hover:bg-[#1e2539] text-white flex items-center gap-4 px-7 py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] transition-all shadow-xl shadow-indigo-100">
+            <div class="bg-indigo-500 rounded-lg p-1">
+                <i data-lucide="plus" class="w-4 h-4 text-white"></i>
+            </div>
+            Initialize Client
+        </button>
+    </div>
+
+    <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-white shadow-2xl shadow-indigo-100/50 overflow-hidden">
+        <div class="overflow-x-auto">
+    <table class="w-full text-left">
+        <thead>
+            <tr class="bg-slate-50/50 border-b border-slate-100">
+                <th class="px-8 py-6 text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">Client</th>
+                <th class="px-8 py-6 text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">Contact</th>
+                <th class="px-8 py-6 text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">Phone</th>
+                <th class="px-8 py-6 text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">Location</th>
+                <th class="px-8 py-6 text-right text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">Execution</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-50">
+            {% for customer in customers %}
+            <tr class="hover:bg-indigo-50/30 transition-all group">
+                <td class="px-8 py-6">
+                    <div class="text-sm font-black text-slate-900 tracking-tight">{{ customer.name }}</div>
+                    <div class="text-[9px] font-bold text-indigo-500 uppercase tracking-widest mt-0.5">Ref: CL-{{ forloop.counter }}</div>
+                </td>
+                <td class="px-8 py-6 text-xs font-bold text-slate-600">{{ customer.email }}</td>
+                
+                <td class="px-8 py-6">
+                    <div class="flex items-center gap-2">
+                        <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                        <span class="text-[11px] font-bold text-slate-700 tracking-tight">{{ customer.phone }}</span>
+                    </div>
+                </td>
+
+                <td class="px-8 py-6 text-[10px] font-semibold text-slate-400 uppercase tracking-tight">
+                    {{ customer.address|truncatechars:30|default:"---" }}
+                </td>
+                
+                <td class="px-8 py-6 text-right">
+                     <button onclick="triggerDelete('{{ customer.id }}', '{{ customer.name }}')" 
+                             class="text-slate-300 hover:text-rose-500 transition-colors p-2">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                     </button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="p-20 text-center text-slate-400 text-[10px] font-bold uppercase tracking-widest">Registry Empty</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+    </div>
+</div>
+
+<div id="clientModal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-[100] backdrop-blur-sm p-4">
+    <div class="bg-white w-full max-w-[460px] rounded-[2rem] shadow-2xl overflow-hidden border border-white/20 modal-animate">
+        <div class="bg-[#0f121d] px-8 py-6 text-white flex justify-between items-center">
+            <div>
+                <h2 class="text-lg font-black uppercase tracking-tighter italic">Client Details</h2>
+                <p class="text-[7px] font-bold text-indigo-400 uppercase tracking-[0.3em] mt-0.5">Customer Registration </p>
+            </div>
+            <button onclick="closeClientModal()" class="p-2 hover:bg-white/10 rounded-xl transition-all">
+                <i data-lucide="x" class="w-4 h-4 text-slate-400"></i>
+            </button>
+        </div>
+        <form action="{% url 'customer_create' %}" method="POST" class="p-8 space-y-4">
+            {% csrf_token %}
+            <div>
+                <label class="tactical-label">Company Name/Full Name</label>
+                <input type="text" name="name" required placeholder="e.g. Acme Corporation" class="tactical-input">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="tactical-label">Email Address</label>
+                    <input type="email" name="email" required placeholder="client@domain.com" class="tactical-input">
+                </div>
+                <div>
+                    <label class="tactical-label">Phone Number</label>
+                    <input type="text" name="phone" required placeholder="+91 00000 00000" class="tactical-input">
+                </div>
+            </div>
+            <div>
+                <label class="tactical-label">Registered Office Address</label>
+                <textarea name="address" rows="3" placeholder="Street, Building, City, ZIP..." class="tactical-input resize-none"></textarea>
+            </div>
+            <div class="flex items-center justify-between pt-4">
+                <button type="button" onclick="closeClientModal()" class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] hover:text-rose-500 transition-colors">Abort Protocol</button>
+                <button type="submit" class="px-8 py-3.5 bg-indigo-600 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-xl shadow-lg hover:bg-indigo-700 transition active:scale-95">Commit Entry</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="deleteModal" class="fixed inset-0 bg-slate-900/80 hidden items-center justify-center z-[110] backdrop-blur-md p-4">
+    <div class="bg-white w-full max-w-[400px] rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 modal-animate">
+        <div class="p-10 text-center">
+            <div class="w-16 h-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-xl font-black text-slate-900 uppercase tracking-tighter italic mb-2">Confirm Deletion</h3>
+            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
+                You are about to permanently purge <br>
+                <span id="deleteTargetName" class="text-rose-500 font-black">---</span> <br>
+                from the Customer registry.
+            </p>
+        </div>
+        
+        <div class="bg-slate-50 p-6 flex gap-3">
+            <button onclick="closeDeleteModal()" class="flex-1 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors">
+                Cancel
+            </button>
+            <form id="deleteForm" method="POST" class="flex-1">
+                {% csrf_token %}
+                <button type="submit" class="w-full py-4 bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-rose-200 hover:bg-rose-600 transition active:scale-95">
+                    Confirm 
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize Client Modal Logic
+    const cModal = document.getElementById('clientModal');
+    function openClientModal() { cModal.classList.remove('hidden'); cModal.classList.add('flex'); }
+    function closeClientModal() { cModal.classList.add('hidden'); cModal.classList.remove('flex'); }
+
+    // Tactical Delete Modal Logic
+    const dModal = document.getElementById('deleteModal');
+    const dForm = document.getElementById('deleteForm');
+    const dNameText = document.getElementById('deleteTargetName');
+
+    function triggerDelete(id, name) {
+        // Construct the URL dynamically (ensure this matches your urls.py)
+        dForm.action = `/customers/delete/${id}/`; 
+        dNameText.innerText = name;
+        dModal.classList.remove('hidden');
+        dModal.classList.add('flex');
+    }
+
+    function closeDeleteModal() {
+        dModal.classList.add('hidden');
+        dModal.classList.remove('flex');
+    }
+
+    // Close on ESC
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { closeClientModal(); closeDeleteModal(); }
+    });
+
+    lucide.createIcons();
+</script>
+{% endblock %}

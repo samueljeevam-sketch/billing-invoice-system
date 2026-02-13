@@ -5,10 +5,12 @@ from django.db import transaction
 from decimal import Decimal
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
 
 
-
-
+@login_required
+@never_cache
 def dashboard(request):
     customer_count = Customer.objects.count()
     invoice_count = Invoice.objects.count()
@@ -58,7 +60,8 @@ def dashboard(request):
 
  
 
-
+@login_required
+@never_cache
 def invoice_list(request):
     invoices = Invoice.objects.select_related("customer").order_by("-id")
     return render(request, "invoice/invoice/invoice_list.html", {
@@ -67,7 +70,8 @@ def invoice_list(request):
 
 
 
-
+@login_required
+@never_cache
 def invoice_create(request):
     customers = Customer.objects.all()
     products = Product.objects.all()
@@ -112,6 +116,27 @@ def invoice_create(request):
 
 
 
+@login_required
+@never_cache
+@transaction.atomic
+def invoice_delete(request, pk):
+    invoice = get_object_or_404(Invoice, pk=pk)
+
+    if request.method == "POST":
+        # Restore stock
+        for item in invoice.items.all():
+            product = item.product
+            product.stock += item.quantity
+            product.save()
+
+        invoice.delete()
+
+    return redirect("invoice_list")
+
+
+
+@login_required
+@never_cache
 def invoice_detail(request, pk):
     invoice = get_object_or_404(Invoice, pk=pk)
     items = invoice.items.all()
@@ -133,16 +158,30 @@ def invoice_detail(request, pk):
         "total": total,
     })
 
+
+
+@login_required
+@never_cache
+
 def invoice_success(request, pk):
     invoice = get_object_or_404(Invoice, pk=pk)
     return render(request, "invoice/invoice/invoice_success.html", {
         "invoice": invoice
     })
 
+
+
+@login_required
+@never_cache
 def product_list(request):
     products = Product.objects.all()
     return render(request, "invoice/product/product_list.html", {"products": products})
 
+
+
+
+@login_required
+@never_cache
 def product_edit(request, pk):
     product = get_object_or_404(Product, pk=pk)
 
@@ -158,6 +197,10 @@ def product_edit(request, pk):
 
     return redirect("product_list")
 
+
+
+@login_required
+@never_cache
 def product_delete(request, pk):
     product = get_object_or_404(Product, pk=pk)
 
@@ -167,6 +210,9 @@ def product_delete(request, pk):
 
     return redirect("product_list")
 
+
+@login_required
+@never_cache
 def product_create(request):
     if request.method == "POST":
         name = request.POST.get("name")
@@ -184,3 +230,63 @@ def product_create(request):
         return redirect("product_list")
 
     return redirect("product_list")
+
+
+
+@login_required
+@never_cache
+def invoice_delete(request, pk):
+    invoice = get_object_or_404(Invoice, pk=pk)
+
+    if request.method == "POST":
+        # Restore stock
+        for item in invoice.items.all():  # related_name='items'
+            product = item.product
+            product.stock += item.quantity
+            product.save()
+
+        invoice.delete()
+
+    return redirect("invoice_list")
+
+
+
+@login_required
+@never_cache
+def customer_list(request):
+    customers = Customer.objects.all().order_by('-id')
+    return render(request, 'invoice/customer/customer_list.html', {
+        'customers': customers
+    })
+
+
+
+@login_required
+@never_cache
+def customer_create(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        phone = request.POST.get("phone")
+        address = request.POST.get("address")
+
+        Customer.objects.create(
+            name=name,
+            email=email,
+            phone=phone,
+            address=address
+        )
+
+    return redirect('customer_list')
+
+
+
+@login_required
+@never_cache
+def customer_delete(request, pk):
+    customer = get_object_or_404(Customer, pk=pk)
+
+    if request.method == "POST":
+        customer.delete()
+
+    return redirect('customer_list')

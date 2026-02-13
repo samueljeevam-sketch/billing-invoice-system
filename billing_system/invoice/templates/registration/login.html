@@ -1,0 +1,278 @@
+{% load static %}
+{% load tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PrimeLedger | Gateway Access</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% tailwind_css %}
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #05070a;
+            color: white;
+        }
+
+        /* Background */
+        .bg-canvas {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 0% 0%, #1a1f35 0%, #05070a 100%);
+            z-index: 0;
+        }
+
+        .bg-grid {
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(rgba(99,102,241,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(99,102,241,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
+        }
+
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            height: 100vh;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* LEFT SIDE */
+        .left-side {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 10%;
+            position: relative;
+        }
+
+        .hero-glow {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(99,102,241,0.12), transparent 70%);
+            top: 40%;
+            left: 10%;
+            filter: blur(80px);
+            z-index: -1;
+        }
+
+        /* RIGHT SIDE */
+        .right-side {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 6%;
+        }
+
+        .floating-white-box {
+            background: #ffffff;
+            width: 100%;
+            max-width: 360px;
+            padding: 2.5rem;
+            border-radius: 2rem;
+            box-shadow:
+                0 0 1px rgba(0,0,0,0.1),
+                0 20px 40px rgba(0,0,0,0.25),
+                0 40px 80px rgba(0,0,0,0.15);
+        }
+
+        .access-input {
+            width: 100%;
+            border: 1.5px solid #eef2f6;
+            border-radius: 1rem;
+            padding: 0.9rem 1rem 0.9rem 2.8rem;
+            font-size: 0.95rem;
+            background: #f8fafc;
+            transition: 0.25s ease;
+            color: #0f172a;
+        }
+
+        .access-input:focus {
+            border-color: #6366f1;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(99,102,241,0.08);
+            outline: none;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1.2rem;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1rem;
+            height: 1rem;
+            color: #94a3b8;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: #0b0e14;
+            color: white;
+            padding: 1rem;
+            border-radius: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            transition: 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: #1a1f26;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 1024px) {
+            .layout-grid { grid-template-columns: 1fr; }
+            .left-side { display: none; }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="bg-canvas"></div>
+<div class="bg-grid"></div>
+
+<div class="layout-grid">
+
+    <!-- LEFT SIDE -->
+    <section class="left-side">
+
+        <div class="hero-glow"></div>
+
+        <!-- Logo + PRIME -->
+        <div class="flex items-start gap-4 mb-6">
+            <img src="{% static 'images/primeledger.png' %}"
+                 class="h-16 w-auto mt-2">
+
+            <div>
+                <h1 class="text-6xl font-extrabold text-white tracking-tight leading-[0.85]">
+                    PRIME
+                </h1>
+                <h1 class="text-6xl font-extrabold text-indigo-500 tracking-tight leading-[0.85]">
+                    LEDGER
+                </h1>
+            </div>
+        </div>
+
+        <!-- Accent Line -->
+        <div class="flex items-center gap-6 mb-8">
+            <div class="h-[2px] w-20 bg-gradient-to-r from-indigo-500 to-transparent"></div>
+            <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.8em]">
+                System Intelligence
+            </p>
+        </div>
+
+        <!-- Tagline (one line) -->
+        <p class="text-slate-400 text-lg font-light whitespace-nowrap">
+            High-frequency ledger synchronization 
+            <span class="text-white italic">built for scale</span>.
+        </p>
+
+        <!-- Status Row -->
+        <div class="flex items-center gap-8 mt-10 text-[11px] uppercase tracking-[0.3em] text-indigo-400">
+
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                <span>Operational</span>
+            </div>
+
+            <div>
+                <span class="text-slate-500">//</span>
+                Encrypted Link
+            </div>
+
+            <div>
+                <span class="text-slate-500">//</span>
+                Node: PL-01
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- RIGHT SIDE -->
+    <section class="right-side">
+        <div class="floating-white-box">
+
+            <header class="mb-8 text-center">
+                <div class="inline-flex items-center px-3 py-1 bg-indigo-50 rounded-full mb-4">
+                    <span class="text-[9px] font-extrabold text-indigo-600 uppercase tracking-widest">
+                        Protocol Interface V4.2
+                    </span>
+                </div>
+
+                <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">
+                    Gateway Login
+                </h2>
+                <div class="w-10 h-1 bg-indigo-500 mx-auto mt-3 rounded-full"></div>
+            </header>
+
+            <form method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+
+                <div class="input-group">
+                    <input type="text" name="username" required placeholder="User ID" class="access-input">
+                    <i data-lucide="user" class="input-icon"></i>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" name="password" required placeholder="Access Key" class="access-input">
+                    <i data-lucide="lock" class="input-icon"></i>
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    submit access
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+                {% if form.errors %}
+<div class="mt-4 text-red-500 text-sm text-center">
+    Invalid username or password.
+</div>
+{% endif %}
+{% if messages %}
+    {% for message in messages %}
+        <div class="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-sm font-semibold text-center">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+            </form>
+
+        </div>
+    </section>
+
+</div>
+
+<script>
+    lucide.createIcons();
+</script>
+
+</body>
+</html>
