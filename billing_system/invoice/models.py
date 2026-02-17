@@ -30,17 +30,31 @@ class Product(models.Model):
 
 
 class Invoice(models.Model):
+
+    STATUS_CHOICES = (
+        ('ACTIVE', 'Active'),
+        ('CANCELLED', 'Cancelled'),
+    )
+
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     invoice_date = models.DateTimeField(auto_now_add=True)
     invoice_amount = models.DecimalField(
         max_digits=12, decimal_places=2, default=Decimal("0.00")
     )
-    gst_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=12.00)
+    gst_percentage = models.DecimalField(
+        max_digits=5, decimal_places=2, default=12.00
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='ACTIVE'
+    )
+
+    created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f"Invoice #{self.id}"
-    
-    created_at = models.DateTimeField(default=timezone.now)
 
 
 class InvoiceItem(models.Model):

@@ -7,6 +7,12 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
+from django.template.loader import render_to_string
+from weasyprint import HTML
+from django.http import HttpResponse
+import os
+os.environ["GDK_SCALE"] = "1"
+
 
 
 @login_required
@@ -63,10 +69,9 @@ def dashboard(request):
 @login_required
 @never_cache
 def invoice_list(request):
-    invoices = Invoice.objects.select_related("customer").order_by("-id")
-    return render(request, "invoice/invoice/invoice_list.html", {
-        "invoices": invoices
-    })
+    invoices = Invoice.objects.all().order_by('-id')
+    return render(request, 'invoice/invoice/invoice_list.html', {'invoices': invoices})
+
 
 
 
@@ -115,23 +120,6 @@ def invoice_create(request):
     })
 
 
-
-@login_required
-@never_cache
-@transaction.atomic
-def invoice_delete(request, pk):
-    invoice = get_object_or_404(Invoice, pk=pk)
-
-    if request.method == "POST":
-        # Restore stock
-        for item in invoice.items.all():
-            product = item.product
-            product.stock += item.quantity
-            product.save()
-
-        invoice.delete()
-
-    return redirect("invoice_list")
 
 
 
@@ -233,22 +221,6 @@ def product_create(request):
 
 
 
-@login_required
-@never_cache
-def invoice_delete(request, pk):
-    invoice = get_object_or_404(Invoice, pk=pk)
-
-    if request.method == "POST":
-        # Restore stock
-        for item in invoice.items.all():  # related_name='items'
-            product = item.product
-            product.stock += item.quantity
-            product.save()
-
-        invoice.delete()
-
-    return redirect("invoice_list")
-
 
 
 @login_required
@@ -290,3 +262,60 @@ def customer_delete(request, pk):
         customer.delete()
 
     return redirect('customer_list')
+
+
+@transaction.atomic
+def cancel_invoice(request, pk):
+    invoice = get_object_or_404(Invoice, pk=pk)
+
+    # Prevent double cancel
+    if invoice.status == 'CANCELLED':
+        messages.warning(request, "Invoice already cancelled.")
+        return redirect('invoice_detail', pk=pk)
+
+    # Restore stock
+    for item in invoice.items.all():
+        product = item.product
+        product.stock += item.quantity
+        product.save()
+
+    # DO NOT DELETE
+    invoice.status = 'CANCELLED'
+    invoice.save()
+
+    messages.success(request, "Invoice cancelled successfully.")
+    return redirect('invoice_detail', pk=pk)
+
+@login_required
+@never_cache
+def invoice_pdf(request, pk):
+    invoice = get_object_or_404(Invoice, pk=pk)
+    items = invoice.items.all()
+
+    totals = items.aggregate(
+        subtotal=Sum("price"),
+        gst=Sum("gst_amount")
+    )
+
+    subtotal = totals["subtotal"] or 0
+    gst = totals["gst"] or 0
+    total = subtotal + gst
+
+    html_string = render_to_string(
+        "invoice/invoice/invoice_page.html",
+        {
+            "invoice": invoice,
+            "items": items,
+            "subtotal": subtotal,
+            "gst": gst,
+            "total": total,
+        }
+    )
+
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="Invoice_{invoice.id}.pdf"'
+
+    HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf(response)
+
+    return response
+

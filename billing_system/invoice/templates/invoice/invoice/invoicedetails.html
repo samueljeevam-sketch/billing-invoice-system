@@ -14,16 +14,9 @@
         -webkit-font-smoothing: grayscale;
     }
 
-    /* Print Optimization */
-    @media print {
-        @page { size: A4 portrait; margin: 15mm; }
-        .no-print { display: none !important; }
-        body { background: white !important; }
-        .invoice-card { border: none !important; box-shadow: none !important; width: 100% !important; }
-    }
-
     .invoice-card {
         border: 1px solid #e5e7eb;
+        max-width: 210mm;
     }
 
     table th {
@@ -39,28 +32,53 @@
 {% block content %}
 {% with currency="₹" %}
 
-<div class="min-h-screen py-10 px-4 flex flex-col items-center">
+<div class="py-10 px-4 flex flex-col items-center">
 
-    <div class="w-full max-w-4xl mb-6 no-print flex justify-between items-center">
-        <button onclick="history.back()" class="text-slate-500 font-semibold text-xs uppercase tracking-widest flex items-center gap-2 hover:text-indigo-600 transition-colors">
-            <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Ledger
+    <!-- Top Action Bar -->
+    <div class="w-full max-w-4xl mb-6 flex justify-between items-center">
+        
+        <button onclick="history.back()"
+            class="text-slate-500 font-semibold text-xs uppercase tracking-widest flex items-center gap-2 hover:text-indigo-600 transition-colors">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            Back to Ledger
         </button>
 
-        <button onclick="window.print()" class="bg-white border border-slate-300 text-slate-700 px-6 py-2 rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-all">
-            Download PDF / Print
-        </button>
+        <!-- 🔥 NEW PDF BUTTON -->
+        <a href="{% url 'invoice_pdf' invoice.id %}"
+           class="bg-slate-900 text-white px-6 py-2 rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-slate-800 transition-all">
+            Download PDF
+        </a>
+
     </div>
 
+    <!-- Invoice Card -->
     <div class="w-full max-w-4xl invoice-card bg-white p-12 md:p-16">
+
+        {% if invoice.status == "CANCELLED" %}
+        <div class="mb-10 p-4 bg-rose-50 border border-rose-200 rounded-lg">
+            <p class="text-rose-600 font-bold text-xs uppercase tracking-widest">
+                This Invoice Has Been Cancelled
+            </p>
+        </div>
+        {% endif %}
         
+        <!-- Header -->
         <div class="flex justify-between items-start mb-16">
             <div>
-                <h1 class="text-3xl font-extrabold tracking-tighter text-slate-900 mb-1">PRIMELEDGER</h1>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mb-8">Business Intelligence</p>
+                <h1 class="text-3xl font-extrabold tracking-tighter text-slate-900 mb-1">
+                    PRIMELEDGER
+                </h1>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mb-8">
+                    Business Intelligence
+                </p>
                 
                 <div class="text-sm">
-                    <p class="font-bold text-slate-500 uppercase text-[10px] tracking-widest mb-1">Invoice Number</p>
-                    <p class="font-mono text-lg font-bold">#INV-{{ invoice.id|stringformat:"04d" }}</p>
+                    <p class="font-bold text-slate-500 uppercase text-[10px] tracking-widest mb-1">
+                        Invoice Number
+                    </p>
+                    <p class="font-mono text-lg font-bold">
+                        #INV-{{ invoice.id|stringformat:"04d" }}
+                    </p>
                 </div>
             </div>
 
@@ -68,63 +86,105 @@
                 <p class="font-bold text-slate-900">Digital Studio Ltd.</p>
                 <p class="text-slate-500">Tech Park, Suite 402, Chennai</p>
                 <p class="text-slate-500">Tamil Nadu, 600001</p>
-                <p class="text-slate-900 font-semibold mt-2 underline decoration-slate-200">GST: 33AAAAA1234A1Z5</p>
+                <p class="text-slate-900 font-semibold mt-2">
+                    GST: 33AAAAA1234A1Z5
+                </p>
             </div>
         </div>
 
+        <!-- Billing Section -->
         <div class="grid grid-cols-3 gap-12 mb-16">
             <div>
-                <h4 class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Billed To</h4>
-                <p class="text-sm font-bold text-slate-900 leading-tight">{{ invoice.customer.name }}</p>
-                <p class="text-sm text-slate-500">{{ invoice.customer.phone }}</p>
+                <h4 class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+                    Billed To
+                </h4>
+                <p class="text-sm font-bold text-slate-900 leading-tight">
+                    {{ invoice.customer.name }}
+                </p>
+                <p class="text-sm text-slate-500">
+                    {{ invoice.customer.phone }}
+                </p>
             </div>
+
             <div>
-                <h4 class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Date of Issue</h4>
-                <p class="text-sm font-bold text-slate-900">{{ invoice.created_at|date:"F d, Y" }}</p>
+                <h4 class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+                    Date of Issue
+                </h4>
+                <p class="text-sm font-bold text-slate-900">
+                    {{ invoice.created_at|date:"F d, Y" }}
+                </p>
             </div>
+
             <div>
-                <h4 class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Terms / Payment</h4>
-                <p class="text-sm font-bold text-slate-900">Immediate / UPI</p>
+                <h4 class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+                    Terms / Payment
+                </h4>
+                <p class="text-sm font-bold text-slate-900">
+                    Immediate / UPI
+                </p>
             </div>
         </div>
 
+        <!-- Items Table -->
         <div class="mb-12">
             <table class="w-full border-collapse">
                 <thead>
                     <tr>
-                        <th class="py-4 text-[10px] font-bold uppercase tracking-widest text-slate-900 text-left">Item Description</th>
-                        <th class="py-4 text-[10px] font-bold uppercase tracking-widest text-slate-900 text-center w-20">Qty</th>
-                        <th class="py-4 text-[10px] font-bold uppercase tracking-widest text-slate-900 text-right w-32">Rate</th>
-                        <th class="py-4 text-[10px] font-bold uppercase tracking-widest text-slate-900 text-right w-32">Amount</th>
+                        <th class="py-4 text-[10px] font-bold uppercase tracking-widest text-left">
+                            Item Description
+                        </th>
+                        <th class="py-4 text-[10px] font-bold uppercase tracking-widest text-center w-20">
+                            Qty
+                        </th>
+                        <th class="py-4 text-[10px] font-bold uppercase tracking-widest text-right w-32">
+                            Rate
+                        </th>
+                        <th class="py-4 text-[10px] font-bold uppercase tracking-widest text-right w-32">
+                            Amount
+                        </th>
                     </tr>
                 </thead>
+
                 <tbody>
                     {% for item in items %}
                     <tr>
                         <td class="py-6 text-sm">
-                            <span class="font-semibold text-slate-800">{{ item.product.name }}</span>
+                            <span class="font-semibold text-slate-800">
+                                {{ item.product.name }}
+                            </span>
                         </td>
-                        <td class="py-6 text-center text-sm font-medium text-slate-600">{{ item.quantity }}</td>
-                        <td class="py-6 text-right text-sm font-medium text-slate-600 tracking-tight">{{ currency }}{{ item.price }}</td>
-                        <td class="py-6 text-right text-sm font-bold text-slate-900 tracking-tight">{{ currency }}{{ item.total_price }}</td>
+                        <td class="py-6 text-center text-sm font-medium text-slate-600">
+                            {{ item.quantity }}
+                        </td>
+                        <td class="py-6 text-right text-sm font-medium text-slate-600">
+                            {{ currency }}{{ item.price }}
+                        </td>
+                        <td class="py-6 text-right text-sm font-bold text-slate-900">
+                            {{ currency }}{{ item.total_price }}
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
 
+        <!-- Totals -->
         <div class="flex justify-end">
             <div class="w-64 space-y-3">
                 <div class="flex justify-between text-xs font-medium text-slate-500">
                     <span>Subtotal</span>
                     <span class="text-slate-900">{{ currency }}{{ subtotal }}</span>
                 </div>
+
                 <div class="flex justify-between text-xs font-medium text-slate-500 pb-3 border-b border-slate-100">
-                    <span>Tax </span>
+                    <span>Tax</span>
                     <span class="text-slate-900">{{ currency }}{{ gst }}</span>
                 </div>
+
                 <div class="flex justify-between items-center pt-2">
-                    <span class="text-xs font-bold uppercase tracking-widest">Total Amount</span>
+                    <span class="text-xs font-bold uppercase tracking-widest">
+                        Total Amount
+                    </span>
                     <span class="text-2xl font-extrabold text-slate-900 tracking-tighter">
                         {{ currency }}{{ invoice.invoice_amount }}
                     </span>
@@ -132,9 +192,10 @@
             </div>
         </div>
 
+        <!-- Footer -->
         <div class="mt-24 pt-8 border-t border-slate-100">
             <p class="text-[10px] text-slate-400 font-medium leading-relaxed max-w-sm">
-                Please quote the invoice number for any future correspondence regarding this transaction. 
+                Please quote the invoice number for any future correspondence regarding this transaction.
                 Thank you for your business.
             </p>
         </div>
