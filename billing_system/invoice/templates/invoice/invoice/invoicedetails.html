@@ -53,14 +53,28 @@
 
     <!-- Invoice Card -->
     <div class="w-full max-w-4xl invoice-card bg-white p-12 md:p-16">
+       {% if invoice.status == "PENDING_CANCEL" %}
+<div class="mb-10 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+    <p class="text-amber-600 font-bold text-xs uppercase tracking-widest">
+        Cancellation Request Pending Approval
+    </p>
+</div>
+{% endif %}
 
-        {% if invoice.status == "CANCELLED" %}
-        <div class="mb-10 p-4 bg-rose-50 border border-rose-200 rounded-lg">
-            <p class="text-rose-600 font-bold text-xs uppercase tracking-widest">
-                This Invoice Has Been Cancelled
-            </p>
-        </div>
-        {% endif %}
+{% if invoice.status == "CANCELLED" %}
+<div class="mb-10 p-4 bg-rose-50 border border-rose-200 rounded-lg">
+    <p class="text-rose-600 font-bold text-xs uppercase tracking-widest mb-1">
+        Invoice Cancelled
+    </p>
+
+    {% if invoice.approved_by %}
+    <p class="text-rose-500 text-xs">
+        Approved by {{ invoice.approved_by.username }}
+        on {{ invoice.approved_at|date:"F d, Y H:i" }}
+    </p>
+    {% endif %}
+</div>
+{% endif %}
         
         <!-- Header -->
         <div class="flex justify-between items-start mb-16">

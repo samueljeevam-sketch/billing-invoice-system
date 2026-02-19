@@ -5,10 +5,13 @@ urlpatterns = [
     path('dashboard/', dashboard, name='dashboard'),
 
     path("invoices/", invoice_list, name="invoice_list"),
-    path("invoices/new/", invoice_create, name="invoice_create"),   
-    path("invoices/<int:pk>/", invoice_detail, name="invoice_detail"),
-    path("invoices/success/<int:pk>/", invoice_success, name="invoice_success"),
-    path('invoice/<int:pk>/cancel/', cancel_invoice, name='cancel_invoice'),
+path("invoices/new/", invoice_create, name="invoice_create"),   
+path("invoices/<int:pk>/", invoice_detail, name="invoice_detail"),
+path("invoices/success/<int:pk>/", invoice_success, name="invoice_success"),
+
+path('invoice/<int:pk>/request-cancel/', request_cancel, name='request_cancel'),
+path('invoice/<int:pk>/cancel/', cancel_invoice, name='cancel_invoice'),
+
 
 
     path("products/", product_list, name="product_list"),

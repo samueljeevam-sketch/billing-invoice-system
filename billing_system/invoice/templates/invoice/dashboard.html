@@ -4,53 +4,24 @@
 
 {% block extra_head %}
 <style>
-    /* 🔥 Page Fade + Slide */
+    /* Page Animations */
     @keyframes pageFadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
+    .dashboard-enter { animation: pageFadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
 
-    .dashboard-enter {
-        animation: pageFadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    /* 🔥 Card Stagger Animation */
-    @keyframes cardFadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(25px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
+    /* Card Styling & Hover */
     .dashboard-card {
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        opacity: 0;
-        animation: cardFadeIn 0.6s ease forwards;
+        display: flex;
+        flex-direction: column;
+        height: 100%; /* Forces equal height in the same row */
     }
-
-    /* stagger delays */
-    .dashboard-card:nth-child(1) { animation-delay: 0.1s; }
-    .dashboard-card:nth-child(2) { animation-delay: 0.2s; }
-    .dashboard-card:nth-child(3) { animation-delay: 0.3s; }
-    .dashboard-card:nth-child(4) { animation-delay: 0.4s; }
-    .dashboard-card:nth-child(5) { animation-delay: 0.5s; }
-    .dashboard-card:nth-child(6) { animation-delay: 0.6s; }
-
     .dashboard-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
     }
-
     .text-gradient {
         background: linear-gradient(135deg, #1e293b 0%, #4f46e5 100%);
         -webkit-background-clip: text;
@@ -76,7 +47,7 @@
     </header>
 
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
-        <div class="lg:col-span-2 dashboard-card bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/30 flex flex-col justify-between relative overflow-hidden">
+        <div class="lg:col-span-2 dashboard-card bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/30 relative overflow-hidden">
             <div class="absolute top-0 right-0 p-6 opacity-5"><i data-lucide="trending-up" class="w-24 h-24"></i></div>
             <div>
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Gross Revenue Flow</p>
@@ -114,6 +85,7 @@
             <h3 class="text-3xl font-black text-slate-900 tracking-tighter mt-1">{{ product_count }}</h3>
         </div>
 
+     
         <div class="dashboard-card bg-orange-50 p-6 rounded-[2.5rem] border border-orange-100 shadow-lg shadow-orange-200/20">
             <div class="flex justify-between items-start mb-4">
                 <div class="p-3 bg-white rounded-2xl border border-orange-100"><i data-lucide="alert-circle" class="w-5 h-5 text-orange-600"></i></div>
@@ -123,20 +95,6 @@
             <h3 class="text-3xl font-black text-orange-700 tracking-tighter mt-1">{{ low_stock_count }}</h3>
             <p class="text-[9px] font-bold text-orange-600 mt-1 uppercase truncate">Refill: <span class="font-black underline">{{ lowest_stock_product_name|default:"None" }}</span></p>
         </div>
-    </div>
-
-    <div class="mb-10">
-        <a href="{% url 'invoice_list' %}" class="dashboard-card group relative bg-indigo-600 p-6 rounded-[2.5rem] shadow-2xl flex items-center justify-between text-white transition-all hover:bg-indigo-700 overflow-hidden">
-            <div class="relative z-10 flex items-center gap-6">
-                <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                    <i data-lucide="layout-grid" class="w-6 h-6"></i>
-                </div>
-                <h3 class="text-xl font-black tracking-tight">Access Enterprise Ledger Management</h3>
-            </div>
-            <div class="relative z-10 bg-white px-5 py-3 rounded-xl text-indigo-600 font-black text-[10px] uppercase tracking-widest flex items-center gap-2">
-                Launch System <i data-lucide="chevron-right" class="w-4 h-4"></i>
-            </div>
-        </a>
     </div>
 
 </div>

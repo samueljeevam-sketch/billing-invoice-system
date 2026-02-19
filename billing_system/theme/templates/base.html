@@ -103,15 +103,37 @@
                 </a>
 
                 <a href="{% url 'invoice_create' %}"
-                   class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all sidebar-link 
-                   {% if 'invoice' in request.resolver_match.url_name %}
-                        sidebar-item-active
-                   {% else %}
-                        text-slate-400
-                   {% endif %}">
-                    <i data-lucide="file-plus" class="w-4 h-4"></i>
-                    <span class="text-xs font-bold uppercase tracking-wider">INVOICE</span>
-                </a>
+   class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all sidebar-link 
+   {% if request.resolver_match.url_name == 'invoice_create' %}
+        sidebar-item-active
+   {% else %}
+        text-slate-400
+   {% endif %}">
+    <i data-lucide="file-plus" class="w-4 h-4"></i>
+    <span class="text-xs font-bold uppercase tracking-wider">INVOICE</span>
+</a>
+
+               <a href="{% url 'invoice_list' %}"
+   class="flex items-center justify-between px-4 py-3 rounded-xl transition-all sidebar-link 
+   {% if request.resolver_match.url_name == 'invoice_list' %}
+        sidebar-item-active
+   {% else %}
+        text-slate-400
+   {% endif %}">
+
+    <div class="flex items-center gap-4">
+        <i data-lucide="book" class="w-4 h-4"></i>
+        <span class="text-xs font-bold uppercase tracking-wider">LEDGER</span>
+    </div>
+
+    {% if pending_approval_count > 0 and perms.invoice.can_approve_cancel %}
+        <span class="ml-2 px-2 py-0.5 text-[9px] font-black rounded-full bg-amber-500 text-white shadow-sm">
+            {{ pending_approval_count }}
+        </span>
+    {% endif %}
+
+</a>
+
 
                 <a href="{% url 'product_list' %}"
                    class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all sidebar-link 

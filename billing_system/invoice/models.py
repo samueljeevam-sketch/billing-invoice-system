@@ -1,7 +1,9 @@
 from decimal import Decimal
+from django.conf import settings
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField
 
 
 class Customer(models.Model):
@@ -33,16 +35,40 @@ class Invoice(models.Model):
 
     STATUS_CHOICES = (
         ('ACTIVE', 'Active'),
+        ('PENDING_CANCEL', 'Pending Cancel Approval'),
         ('CANCELLED', 'Cancelled'),
     )
 
+    invoice_number = models.CharField(
+        max_length=20,
+        unique=True,
+        null=True,
+        blank=True
+    )
+    approved_by = models.ForeignKey(
+    settings.AUTH_USER_MODEL,
+    null=True,
+    blank=True,
+    on_delete=models.SET_NULL,
+    related_name="approved_invoices"
+    )
+
+    approved_at = models.DateTimeField(null=True, blank=True)
+
+
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     invoice_date = models.DateTimeField(auto_now_add=True)
+
     invoice_amount = models.DecimalField(
-        max_digits=12, decimal_places=2, default=Decimal("0.00")
+        max_digits=12,
+        decimal_places=2,
+        default=Decimal("0.00")
     )
+
     gst_percentage = models.DecimalField(
-        max_digits=5, decimal_places=2, default=12.00
+        max_digits=5,
+        decimal_places=2,
+        default=12.00
     )
 
     status = models.CharField(
@@ -53,8 +79,28 @@ class Invoice(models.Model):
 
     created_at = models.DateTimeField(default=timezone.now)
 
+    def save(self, *args, **kwargs):
+        if not self.invoice_number:
+            last_invoice = Invoice.objects.order_by('-id').first()
+
+            if last_invoice and last_invoice.invoice_number:
+                last_number = int(last_invoice.invoice_number.split('-')[-1])
+                new_number = last_number + 1
+            else:
+                new_number = 1
+
+            self.invoice_number = f"INV-{new_number:04d}"
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"Invoice #{self.id}"
+        return self.invoice_number
+
+    class Meta:
+        permissions = [
+            ("can_approve_cancel", "Can approve invoice cancellation"),
+        ]
+
 
 
 class InvoiceItem(models.Model):

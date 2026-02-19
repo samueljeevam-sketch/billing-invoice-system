@@ -1,3 +1,4 @@
+from datetime import timezone
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Sum, F, ExpressionWrapper, DecimalField
 from .models import Customer, Invoice, InvoiceItem, Product
@@ -11,6 +12,13 @@ from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.http import HttpResponse
 import os
+from django.contrib.auth.decorators import permission_required
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.db import models
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField
+from django.utils import timezone
+
 os.environ["GDK_SCALE"] = "1"
 
 
@@ -157,6 +165,46 @@ def invoice_success(request, pk):
         "invoice": invoice
     })
 
+@login_required
+@transaction.atomic
+@permission_required('invoice.can_approve_cancel', raise_exception=True)
+def cancel_invoice(request, pk):
+    invoice = get_object_or_404(Invoice, pk=pk)
+
+    if invoice.status != 'PENDING_CANCEL':
+        messages.warning(request, "Invoice must be pending approval.")
+        return redirect('invoice_detail', pk=pk)
+
+    # Restore stock
+    for item in invoice.items.all():
+        product = item.product
+        product.stock += item.quantity
+        product.save()
+
+    invoice.status = 'CANCELLED'
+    invoice.approved_by = request.user
+    invoice.approved_at = timezone.now()
+    invoice.save()
+
+    messages.success(request, "Invoice cancellation approved.")
+    return redirect('invoice_detail', pk=pk)
+
+
+
+@login_required
+@permission_required('invoice.change_invoice', raise_exception=True)
+def request_cancel(request, pk):
+    invoice = get_object_or_404(Invoice, pk=pk)
+
+    if invoice.status != 'ACTIVE':
+        messages.warning(request, "Only active invoices can be requested for cancellation.")
+        return redirect('invoice_detail', pk=pk)
+
+    invoice.status = 'PENDING_CANCEL'
+    invoice.save()
+
+    messages.success(request, "Cancellation request submitted.")
+    return redirect('invoice_detail', pk=pk)
 
 
 @login_required
@@ -189,6 +237,7 @@ def product_edit(request, pk):
 
 @login_required
 @never_cache
+
 def product_delete(request, pk):
     product = get_object_or_404(Product, pk=pk)
 
@@ -264,27 +313,7 @@ def customer_delete(request, pk):
     return redirect('customer_list')
 
 
-@transaction.atomic
-def cancel_invoice(request, pk):
-    invoice = get_object_or_404(Invoice, pk=pk)
 
-    # Prevent double cancel
-    if invoice.status == 'CANCELLED':
-        messages.warning(request, "Invoice already cancelled.")
-        return redirect('invoice_detail', pk=pk)
-
-    # Restore stock
-    for item in invoice.items.all():
-        product = item.product
-        product.stock += item.quantity
-        product.save()
-
-    # DO NOT DELETE
-    invoice.status = 'CANCELLED'
-    invoice.save()
-
-    messages.success(request, "Invoice cancelled successfully.")
-    return redirect('invoice_detail', pk=pk)
 
 @login_required
 @never_cache
