@@ -95,6 +95,7 @@
                     </h3>
 
                     <div class="space-y-6">
+
                         <div class="flex justify-between">
                             <span class="text-slate-400 text-sm">Subtotal</span>
                             <span class="text-white font-bold"
@@ -102,9 +103,15 @@
                         </div>
 
                         <div class="flex justify-between">
-                            <span class="text-slate-400 text-sm">Tax</span>
+                            <span class="text-slate-400 text-sm">CGST (9%)</span>
                             <span class="text-indigo-400 font-bold"
-                                  x-text="'₹' + calculateTax()"></span>
+                                  x-text="'₹' + calculateCGST()"></span>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <span class="text-slate-400 text-sm">SGST (9%)</span>
+                            <span class="text-indigo-400 font-bold"
+                                  x-text="'₹' + calculateSGST()"></span>
                         </div>
 
                         <div class="bg-white/10 rounded-3xl p-6 mt-6">
@@ -133,22 +140,17 @@
 
 </div>
 
-<!-- Alpine -->
 <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    lucide.createIcons();
-});
-
 function invoiceHandler() {
     return {
         items: [{ id: Date.now(), productId: '', qty: 1, price: 0 }],
-        taxRate: 0.18,
+        cgstRate: 0.09,
+        sgstRate: 0.09,
 
         addItem() {
             this.items.push({ id: Date.now(), productId: '', qty: 1, price: 0 });
-            this.$nextTick(() => lucide.createIcons());
         },
 
         removeItem(i) {
@@ -172,14 +174,21 @@ function invoiceHandler() {
             );
         },
 
-        calculateTax() {
+        calculateCGST() {
             const sub = this.items.reduce((s, i) => s + (i.qty * i.price), 0);
-            return this.formatCurrency(sub * this.taxRate);
+            return this.formatCurrency(sub * this.cgstRate);
+        },
+
+        calculateSGST() {
+            const sub = this.items.reduce((s, i) => s + (i.qty * i.price), 0);
+            return this.formatCurrency(sub * this.sgstRate);
         },
 
         calculateGrandTotal() {
             const sub = this.items.reduce((s, i) => s + (i.qty * i.price), 0);
-            return this.formatCurrency(sub + (sub * this.taxRate));
+            const cgst = sub * this.cgstRate;
+            const sgst = sub * this.sgstRate;
+            return this.formatCurrency(sub + cgst + sgst);
         }
     }
 }

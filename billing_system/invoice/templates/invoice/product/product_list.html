@@ -39,7 +39,6 @@
         box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.04);
     }
 
-    /* Status Glows */
     .status-glow { box-shadow: 0 0 8px currentColor; }
 
     /* SweetAlert Professional Customization */
@@ -114,17 +113,20 @@
                             <span class="text-sm font-bold text-slate-700 font-mono-custom">₹{{ product.price }}</span>
                         </td>
                         <td class="px-8 py-6">
-                            <span class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-slate-100 text-slate-500">GST {{ product.gst_percent }}%</span>
+                            <div class="flex flex-col gap-1">
+                                <span class="w-max px-3 py-1.5 rounded-xl text-[10px] font-black bg-slate-100 text-slate-500">GST {{ product.gst_percent }}%</span>
+                                
+                            </div>
                         </td>
                         <td class="px-8 py-6">
                             {% if product.stock > 10 %}
                                 <div class="flex items-center gap-2">
-                                    <div class="w-2 h-2 rounded-full bg-emerald-500 status-glow text-emerald-500"></div>
+                                    <div class="w-2 h-2 rounded-full bg-emerald-500 status-glow"></div>
                                     <span class="text-[10px] font-black text-emerald-700 uppercase tracking-widest">{{ product.stock }} UNITS</span>
                                 </div>
                             {% elif product.stock > 0 %}
                                 <div class="flex items-center gap-2">
-                                    <div class="w-2 h-2 rounded-full bg-amber-500 status-glow text-amber-500"></div>
+                                    <div class="w-2 h-2 rounded-full bg-amber-500 status-glow"></div>
                                     <span class="text-[10px] font-black text-amber-700 uppercase tracking-widest">LOW: {{ product.stock }}</span>
                                 </div>
                             {% else %}
@@ -140,7 +142,7 @@
                                         class="p-2.5 text-slate-400 hover:text-indigo-600 hover:bg-white rounded-xl transition-all shadow-sm border border-transparent hover:border-slate-100">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                                 </button>
-                                <button type="button" onclick="confirmPurge(this, '{{ product.id }}', '{{ product.name|escapejs }}')"
+                                <button type="button" onclick="confirmPurge('{{ product.id }}', '{{ product.name|escapejs }}')"
                                         class="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-white rounded-xl transition-all shadow-sm border border-transparent hover:border-slate-100">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                 </button>
@@ -160,9 +162,14 @@
 
 <div id="productModal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 backdrop-blur-md p-4">
     <div class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden border border-white">
-        <div class="bg-slate-900 px-10 py-8 text-white">
-            <h2 id="modalTitle" class="text-2xl font-black uppercase tracking-tighter">Initialize Asset</h2>
-            <p class="text-[9px] font-bold text-indigo-400 uppercase tracking-[0.3em] mt-1">Registry Modification Terminal</p>
+        <div class="bg-slate-900 px-10 py-8 text-white flex justify-between items-start">
+            <div>
+                <h2 id="modalTitle" class="text-2xl font-black uppercase tracking-tighter">Initialize Asset</h2>
+                <p class="text-[9px] font-bold text-indigo-400 uppercase tracking-[0.3em] mt-1">Registry Modification Terminal</p>
+            </div>
+            <button onclick="closeModal('productModal')" class="text-slate-500 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"></path></svg>
+            </button>
         </div>
 
         <form method="POST" id="productForm" class="p-10 space-y-6">
@@ -181,8 +188,12 @@
                 </div>
                 <div>
                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Tax Code (%)</label>
-                    <select name="gst_percent" id="pGST" class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none transition font-bold appearance-none">
-                        <option value="0">0% (EXEMPT)</option><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option><option value="28">28%</option>
+                    <select name="gst_percent" id="pGST" class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none transition font-bold appearance-none cursor-pointer">
+                        <option value="0">0% (EXEMPT)</option>
+                        <option value="5">5%</option>
+                        <option value="12">12%</option>
+                        <option value="18">18%</option>
+                        <option value="28">28%</option>
                     </select>
                 </div>
             </div>
@@ -203,38 +214,47 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    const modal = document.getElementById("productModal");
+    const form = document.getElementById("productForm");
+
     function openModal(id) {
         const m = document.getElementById(id);
-        m.classList.remove("hidden"); m.classList.add("flex");
+        m.classList.remove("hidden"); 
+        m.classList.add("flex");
     }
+
     function closeModal(id) {
         const m = document.getElementById(id);
-        m.classList.add("hidden"); m.classList.remove("flex");
+        m.classList.add("hidden"); 
+        m.classList.remove("flex");
     }
+
     function openAddModal() {
         document.getElementById("modalTitle").innerText = "Initialize Asset";
-        document.getElementById("productForm").action = "{% url 'product_create' %}";
-        document.getElementById("productForm").reset();
+        form.action = "{% url 'product_create' %}"; // Ensure this name matches your urls.py
+        form.reset();
         openModal("productModal");
     }
+
     function openEditModal(id, name, price, gst, stock) {
         document.getElementById("modalTitle").innerText = "Reconfigure Asset";
         document.getElementById("pName").value = name;
         document.getElementById("pPrice").value = price;
         document.getElementById("pGST").value = gst;
         document.getElementById("pStock").value = stock;
-        document.getElementById("productForm").action = "/products/edit/" + id + "/";
+        // Dynamically set action. Replace '/products/edit/' with your actual URL pattern prefix
+        form.action = "/products/edit/" + id + "/"; 
         openModal("productModal");
     }
 
-    // Professional Delete Logic
-    function confirmPurge(button, id, name) {
+    // Professional Purge Protocol
+    function confirmPurge(id, name) {
         Swal.fire({
             title: '⚠️ CRITICAL PURGE AUTHORIZATION',
             html: `
                 <div class="text-left font-mono-custom mt-4">
                     <p class="mb-2 text-[10px] text-rose-500 font-bold uppercase tracking-widest">Immediate Action Required</p>
-                    <p class="text-[12px] text-slate-300">You are purging <span class="text-white font-bold underline">${name}</span> from the active inventory. This will erase all stock tracking for this entry.</p>
+                    <p class="text-[12px] text-slate-300">You are purging <span class="text-white font-bold underline">${name}</span> from the active inventory. This will erase all stock tracking.</p>
                 </div>
             `,
             icon: 'warning',
@@ -248,19 +268,24 @@
             customClass: { popup: 'prime-modal' }
         }).then((result) => {
             if (result.isConfirmed) {
-                const form = document.getElementById('globalDeleteForm');
-                form.action = "/products/delete/" + id + "/";
-                form.submit();
+                const deleteForm = document.getElementById('globalDeleteForm');
+                deleteForm.action = "/products/delete/" + id + "/";
+                deleteForm.submit();
             }
         });
     }
 
-    // Tactical Search
+    // Search Filtering
     document.getElementById("tableSearch").addEventListener("keyup", function() {
         let value = this.value.toLowerCase();
         document.querySelectorAll("tbody tr").forEach(row => {
             row.style.display = row.innerText.toLowerCase().includes(value) ? "" : "none";
         });
     });
+
+    // Close modal on outside click
+    window.onclick = function(event) {
+        if (event.target == modal) closeModal('productModal');
+    }
 </script>
 {% endblock %}

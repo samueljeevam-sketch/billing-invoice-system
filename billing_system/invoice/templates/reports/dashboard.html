@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Reports | PrimeLedger Intelligence{% endblock %}
+
+{% block extra_head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; }
+    .font-mono-custom { font-family: 'JetBrains Mono', monospace; }
+    
+    .glass-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    .stat-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Custom Styling for Date Inputs */
+    input[type="date"] {
+        appearance: none;
+        -webkit-appearance: none;
+        color: #64748b;
+        font-weight: 700;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-6 lg:px-12 py-10">
+
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        <div>
+            <div class="flex items-center gap-3 mb-1">
+                <div class="w-1.5 h-5 bg-indigo-600 rounded-full"></div>
+                <span class="text-indigo-600 text-[10px] font-black uppercase tracking-[0.4em]">Analytics Protocol</span>
+            </div>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tighter uppercase">Financial Intelligence</h1>
+        </div>
+
+        <form method="GET" class="glass-card p-2 rounded-2xl flex items-center gap-2 shadow-sm">
+            <div class="flex items-center px-4 gap-3 border-r border-slate-100">
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Range</span>
+                <input type="date" name="from_date" value="{{ from_date }}"
+                       class="bg-transparent border-none focus:ring-0 cursor-pointer text-indigo-600">
+                <span class="text-slate-300">—</span>
+                <input type="date" name="to_date" value="{{ to_date }}"
+                       class="bg-transparent border-none focus:ring-0 cursor-pointer text-indigo-600">
+            </div>
+            <button type="submit"
+                class="bg-slate-900 hover:bg-indigo-600 text-white px-6 py-2.5 rounded-xl text-[10px] font-black tracking-widest transition-all active:scale-95">
+                EXECUTE FILTER
+            </button>
+        </form>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        
+        <div class="glass-card stat-card p-8 rounded-[2.5rem]">
+            <div class="flex justify-between items-start mb-4">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Invoices Processed</p>
+                <div class="p-2 bg-slate-50 rounded-lg text-slate-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+            </div>
+            <h2 class="text-4xl font-black text-slate-900">{{ total_invoices }}</h2>
+            <div class="mt-4 flex items-center gap-2">
+                <span class="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-md">{{ paid_invoices }} Paid</span>
+                <span class="text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-md">{{ unpaid_invoices }} Unpaid</span>
+            </div>
+        </div>
+
+        <div class="bg-slate-900 stat-card p-8 rounded-[2.5rem] shadow-2xl shadow-indigo-200/50 lg:col-span-2 relative overflow-hidden group">
+            <div class="absolute top-0 right-0 p-12 opacity-10 group-hover:scale-110 transition-transform duration-700">
+                <svg class="w-32 h-32 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.21 1.87 1.15 0 1.94-.51 1.94-1.51 0-.9-.36-1.45-1.76-1.88l-1.45-.44c-1.82-.57-2.82-1.39-2.82-3.05 0-1.57 1.14-2.74 2.89-3.1V5h2.67v1.93c1.44.27 2.48 1.13 2.7 2.48h-1.9c-.11-.79-.56-1.39-1.53-1.39-1.07 0-1.77.53-1.77 1.38 0 .76.35 1.26 1.77 1.67l1.1.33c2.04.63 3.06 1.47 3.06 3.25 0 1.89-1.33 3.12-3.3 3.4z"/></svg>
+            </div>
+            <p class="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em] mb-3">Gross Realized Revenue</p>
+            <h2 class="text-5xl font-black text-white tracking-tighter">
+                <span class="text-indigo-400 font-medium mr-1">₹</span>{{ total_revenue|floatformat:2 }}
+            </h2>
+            <div class="mt-6 flex items-center gap-3">
+                <div class="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+                    <div class="h-full bg-indigo-500 w-3/4"></div>
+                </div>
+                <span class="text-[10px] font-black text-indigo-300">Target</span>
+            </div>
+        </div>
+
+        <div class="glass-card stat-card p-8 rounded-[2.5rem]">
+            <p class="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-4">Tax Liability (GST)</p>
+            <h2 class="text-3xl font-black text-slate-900">₹{{ total_gst|floatformat:2 }}</h2>
+            <p class="text-[10px] font-bold text-slate-400 mt-2">Inclusive of CGST/SGST/IGST</p>
+            <div class="mt-6">
+                <span class="inline-flex items-center text-[9px] font-black text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full border border-indigo-100">
+                    TAX COMPLIANT
+                </span>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="glass-card p-10 rounded-[3rem] shadow-xl shadow-slate-200/40">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-xl font-black text-slate-900 uppercase tracking-tight">Revenue Trajectory</h2>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Monthly performance scaling</p>
+            </div>
+            <div class="flex gap-2">
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-100">
+                    <div class="w-2 h-2 rounded-full bg-indigo-500"></div>
+                    <span class="text-[9px] font-black text-slate-500 uppercase">Paid Volume</span>
+                </div>
+            </div>
+        </div>
+        <div class="relative h-[400px]">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+{{ labels|json_script:"chart-labels" }}
+{{ values|json_script:"chart-values" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const labels = JSON.parse(document.getElementById('chart-labels').textContent);
+    const values = JSON.parse(document.getElementById('chart-values').textContent);
+
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    
+    // Gradient for the chart
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(79, 70, 229, 0.2)');
+    gradient.addColorStop(1, 'rgba(79, 70, 229, 0)');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Revenue',
+                data: values,
+                fill: true,
+                backgroundColor: gradient,
+                borderColor: '#4f46e5',
+                borderWidth: 4,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#4f46e5',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                tension: 0.4 // Creates the smooth curve
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { 
+                        font: { family: 'JetBrains Mono', size: 10, weight: '700' },
+                        color: '#94a3b8'
+                    }
+                },
+                y: {
+                    border: { display: false },
+                    grid: { color: '#f1f5f9' },
+                    ticks: { 
+                        font: { family: 'JetBrains Mono', size: 10, weight: '700' },
+                        color: '#94a3b8',
+                        callback: function(value) { return '₹' + value.toLocaleString(); }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
