@@ -8,9 +8,9 @@
         width: 100%;
         background-color: #f8fafc;
         border: 1px solid #e2e8f0;
-        border-radius: 1rem;
-        padding: 0.75rem 1.25rem;
-        font-size: 0.875rem;
+        border-radius: 0.75rem;
+        padding: 0.65rem 1rem;
+        font-size: 0.8rem;
         font-weight: 600;
         color: #0f172a;
         outline: none;
@@ -20,7 +20,15 @@
     .tactical-input:focus {
         background-color: #ffffff;
         border-color: #6366f1;
-        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08);
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    /* Modern Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { 
+        background: #e2e8f0; 
+        border-radius: 10px; 
     }
 
     .registry-container {
@@ -29,7 +37,6 @@
         flex-direction: column;
     }
 
-    /* Glassmorphism & Animations */
     @keyframes modalIn {
         from { opacity: 0; transform: scale(0.98) translateY(10px); }
         to { opacity: 1; transform: scale(1) translateY(0); }
@@ -38,127 +45,118 @@
     .modal-animate { animation: modalIn 0.25s cubic-bezier(0.2, 1, 0.3, 1); }
 
     .registry-table-wrapper {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border: 1px solid #ffffff;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.02);
-    }
-
-    /* REFINED SEARCH BAR - Removed "Black Box" focus */
-    .search-container {
-        transition: all 0.3s ease;
-        border: 1px solid #e2e8f0;
-        outline: none !important; /* Forces removal of browser default */
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(226, 232, 240, 0.8);
     }
 
     .search-container:focus-within {
         border-color: #6366f1;
         background: #ffffff;
-        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.05);
+        box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.1);
     }
 
-    /* Ensure the input itself never shows a ring */
-    #clientSearch:focus {
-        ring: 0 !important;
-        outline: none !important;
-        box-shadow: none !important;
+    .btn-loading {
+        pointer-events: none;
+        opacity: 0.7;
     }
 </style>
 
-<div class="p-8 lg:p-12 max-w-[1600px] mx-auto registry-container overflow-hidden">
-
-    <div class="flex flex-col gap-8 mb-10 shrink-0">
-        <div class="flex justify-between items-end">
+<div class="p-6 lg:p-10 max-w-[1600px] mx-auto registry-container overflow-hidden">
+    <div class="flex flex-col gap-6 mb-8 shrink-0">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-end gap-4">
             <div>
-                <div class="flex items-center gap-2 mb-1">
-                    <div class="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse"></div>
-                    <span class="text-indigo-600 text-[10px] font-black uppercase tracking-[0.4em]">Network Active</span>
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-600"></span>
+                    </span>
+                    <span class="text-indigo-600 text-[10px] font-black uppercase tracking-[0.4em]">System Link: Active</span>
                 </div>
-                <h1 class="text-4xl font-black text-slate-900 tracking-tighter uppercase italic">Client Registry</h1>
+                <h1 class="text-5xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">Registry</h1>
             </div>
 
             <button onclick="openClientModal()"
-                class="bg-slate-900 hover:bg-indigo-600 text-white px-8 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95 flex items-center gap-3">
+                class="group bg-slate-900 hover:bg-indigo-600 text-white px-8 py-4 rounded-2xl text-[11px] font-bold uppercase tracking-widest shadow-2xl transition-all active:scale-95 flex items-center justify-center gap-3">
                 <i data-lucide="user-plus" class="w-4 h-4"></i>
                 Initialize Client
             </button>
         </div>
 
-        <div class="flex gap-4 items-center">
-            <div class="flex-1 relative search-container flex items-center bg-slate-50/50 rounded-2xl px-6 py-4">
+        <div class="flex flex-col md:flex-row gap-4 items-stretch">
+            <div class="flex-1 relative search-container transition-all flex items-center bg-slate-100/50 border border-transparent rounded-2xl px-6 py-4">
                 <i data-lucide="search" class="w-4 h-4 text-slate-400 mr-4"></i>
                 <input type="text" id="clientSearch" 
-                       placeholder="SCAN REGISTRY BY NAME, EMAIL, OR IDENTITY..." 
-                       class="bg-transparent border-none focus:ring-0 focus:outline-none p-0 text-[10px] font-black uppercase tracking-[0.2em] w-full text-slate-900 placeholder-slate-400">
+                       placeholder="SCAN DATABASE BY IDENTITY OR PROTOCOL..." 
+                       class="bg-transparent border-none focus:ring-0 focus:outline-none p-0 text-[11px] font-bold uppercase tracking-[0.15em] w-full text-slate-900 placeholder-slate-400">
             </div>
             
-            <div class="bg-white border border-slate-100 px-6 py-4 rounded-2xl flex items-center gap-4 shadow-sm">
-                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Active Nodes</span>
-                <span class="text-sm font-black text-slate-900">{{ customers|length }}</span>
+            <div class="bg-white border border-slate-200 px-6 py-4 rounded-2xl flex items-center gap-6 shadow-sm">
+                <div class="flex flex-col">
+                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Active Nodes</span>
+                    <span class="text-lg font-black text-slate-900 leading-none">{{ customers|length }}</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="registry-table-wrapper rounded-[2.5rem] flex-1 min-h-0 flex flex-col overflow-hidden">
+    <div class="registry-table-wrapper rounded-[2rem] flex-1 min-h-0 flex flex-col overflow-hidden shadow-sm">
         <div class="overflow-y-auto custom-scrollbar flex-1">
             <table class="w-full text-left border-separate border-spacing-0" id="clientTable">
-                <thead class="sticky top-0 bg-white/90 backdrop-blur-md z-10">
+                <thead class="sticky top-0 bg-white/95 backdrop-blur-sm z-10">
                     <tr>
-                        <th class="pl-10 py-6 text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 border-b border-slate-50">Identity</th>
-                        <th class="px-6 py-6 text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 border-b border-slate-50">Comms Protocol</th>
-                        <th class="px-6 py-6 text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 border-b border-slate-50">Operational Base</th>
-                        <th class="pr-10 py-6 text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 text-right border-b border-slate-50">Terminal</th>
+                        <th class="pl-10 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100">Identity</th>
+                        <th class="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100">Comms Protocol</th>
+                        <th class="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100">Operational Base</th>
+                        <th class="pr-10 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-right border-b border-slate-100">Access</th>
                     </tr>
                 </thead>
 
                 <tbody class="divide-y divide-slate-50">
                     {% for customer in customers %}
-                    <tr class="group hover:bg-slate-50/50 transition-all client-row">
+                    <tr class="group hover:bg-indigo-50/30 transition-colors client-row">
                         <td class="pl-10 py-5">
                             <div class="flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-white flex items-center justify-center text-slate-900 text-[10px] font-black uppercase border border-transparent group-hover:border-slate-200 transition-all">
+                                <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center text-[11px] font-black uppercase shadow-lg group-hover:bg-indigo-600 transition-colors">
                                     {{ customer.name|slice:":2" }}
                                 </div>
                                 <div class="flex flex-col">
                                     <span class="text-sm font-black text-slate-900 uppercase tracking-tight name-cell">{{ customer.name }}</span>
-                                    <span class="text-[9px] font-bold text-slate-400 tracking-widest uppercase">NODE // {{ customer.id|truncatechars:12 }}</span>
+                                    <span class="text-[9px] font-bold text-slate-400 tracking-widest uppercase">ID // {{ customer.id|truncatechars:12 }}</span>
                                 </div>
                             </div>
                         </td>
                         <td class="px-6 py-5">
-                            <div class="flex flex-col gap-1.5">
-                                <div class="flex items-center gap-2 text-slate-600 text-[11px] font-bold email-cell">
-                                    <div class="w-1 h-1 rounded-full bg-indigo-500"></div>
-                                    {{ customer.email }}
-                                </div>
-                                <div class="flex items-center gap-2 text-slate-400 text-[10px] font-bold">
-                                    {{ customer.phone }}
-                                </div>
+                            <div class="flex flex-col gap-1">
+                                <span class="text-slate-700 text-[12px] font-bold email-cell lowercase">{{ customer.email }}</span>
+                                <span class="text-slate-400 text-[10px] font-medium">{{ customer.phone }}</span>
                             </div>
                         </td>
                         <td class="px-6 py-5">
-                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
-                                {{ customer.address|truncatechars:40|default:"-- NO BASE LOCATED --" }}
+                            <span class="text-[11px] font-semibold text-slate-500 uppercase">
+                                {{ customer.address|truncatechars:45|default:"-- LOCATION REDACTED --" }}
                             </span>
                         </td>
                         <td class="pr-10 py-5 text-right">
-                            <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                            <div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all">
                                 <button onclick="openEditClient('{{ customer.id }}', '{{ customer.name|escapejs }}', '{{ customer.email|default_if_none:''|escapejs }}', '{{ customer.phone|escapejs }}', '{{ customer.address|default_if_none:''|escapejs }}')"
-                                    class="p-2.5 text-slate-400 hover:text-indigo-600 transition-colors">
+                                    class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-white rounded-lg transition-all">
                                     <i data-lucide="edit-3" class="w-4 h-4"></i>
                                 </button>
                                 <button onclick="triggerDelete('{{ customer.id }}','{{ customer.name|escapejs }}')"
-                                    class="p-2.5 text-slate-400 hover:text-rose-600 transition-colors">
+                                    class="p-2 text-slate-400 hover:text-rose-600 hover:bg-white rounded-lg transition-all">
                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                                 </button>
                             </div>
                         </td>
                     </tr>
                     {% empty %}
-                    <tr>
+                    <tr id="emptyState">
                         <td colspan="4" class="text-center py-32">
-                            <i data-lucide="database" class="w-12 h-12 text-slate-100 mx-auto mb-4"></i>
-                            <p class="text-[10px] font-black text-slate-300 uppercase tracking-[0.5em]">Registry Offline</p>
+                            <div class="flex flex-col items-center opacity-20">
+                                <i data-lucide="database-zap" class="w-16 h-16 mb-4"></i>
+                                <p class="text-[12px] font-black uppercase tracking-[0.8em]">Registry Null</p>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -168,18 +166,104 @@
     </div>
 </div>
 
+<div id="clientModal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 backdrop-blur-md p-4">
+    <div class="bg-white w-full max-w-lg rounded-[2rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] overflow-hidden modal-animate flex flex-col max-h-[90vh]">
+        
+        <div class="bg-slate-900 px-8 py-6 text-white shrink-0 relative">
+            <h2 class="text-xl font-black uppercase tracking-tight italic">Initialize Client</h2>
+            <p class="text-[9px] text-indigo-400 font-black uppercase tracking-[0.3em] mt-0.5">Registry Creation Terminal</p>
+            
+            <button onclick="closeClientModal()" class="absolute top-6 right-6 text-slate-500 hover:text-white">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <div class="overflow-y-auto custom-scrollbar">
+            <form id="clientForm" method="POST" action="{% url 'customer_create' %}" class="p-8 space-y-5">
+                {% csrf_token %}
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Client Name *</label>
+                        <input type="text" name="name" required placeholder="ARASAKA" class="tactical-input">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Protocol</label>
+                        <input type="email" name="email" placeholder="client@net.com" class="tactical-input">
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone Link</label>
+                    <input type="text" name="phone" placeholder="+1 (555) 000-0000" class="tactical-input">
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Operational Base</label>
+                    <textarea name="address" rows="2" placeholder="Enter coordinates..." class="tactical-input resize-none"></textarea>
+                </div>
+
+                <div class="flex items-center gap-3 pt-2">
+                    <button type="button" onclick="closeClientModal()"
+                            class="flex-1 py-3.5 text-slate-400 hover:text-slate-900 font-black text-[10px] uppercase tracking-widest transition-colors">
+                        Abort
+                    </button>
+
+                    <button type="submit" id="submitBtn"
+                            class="flex-[2] py-3.5 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase tracking-[0.15em] hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                        Confirm Registration
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
-    // Live Search (No-Flash)
-    document.getElementById('clientSearch').addEventListener('keyup', function() {
-        let filter = this.value.toUpperCase();
-        let rows = document.querySelectorAll('.client-row');
-        rows.forEach(row => {
-            let name = row.querySelector('.name-cell').innerText.toUpperCase();
-            let email = row.querySelector('.email-cell').innerText.toUpperCase();
-            row.style.display = (name.includes(filter) || email.includes(filter)) ? "" : "none";
-        });
+function openClientModal() {
+    const modal = document.getElementById("clientModal");
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+    document.body.style.overflow = 'hidden';
+}
+
+function closeClientModal() {
+    const modal = document.getElementById("clientModal");
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+    document.body.style.overflow = 'auto';
+}
+
+document.getElementById('clientForm').onsubmit = function() {
+    const btn = document.getElementById('submitBtn');
+    btn.innerHTML = `<span class="animate-spin inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full mr-2"></span> Processing...`;
+    btn.classList.add('btn-loading');
+};
+
+document.getElementById('clientSearch').addEventListener('input', function() {
+    let filter = this.value.toUpperCase();
+    let rows = document.querySelectorAll('.client-row');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+        let name = row.querySelector('.name-cell').innerText.toUpperCase();
+        let email = row.querySelector('.email-cell').innerText.toUpperCase();
+        if (name.includes(filter) || email.includes(filter)) {
+            row.style.display = "";
+            visibleCount++;
+        } else {
+            row.style.display = "none";
+        }
     });
 
-    // ... (Keep your existing Modal & Delete logic here) ...
+    const emptyMsg = document.getElementById('emptyState');
+    if(emptyMsg) emptyMsg.style.display = visibleCount === 0 ? "" : "none";
+});
+
+window.onclick = function(event) {
+    let modal = document.getElementById("clientModal");
+    if (event.target === modal) closeClientModal();
+}
 </script>
 {% endblock %}

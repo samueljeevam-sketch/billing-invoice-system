@@ -9,179 +9,235 @@
     {% tailwind_css %}
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <style>
-        /* ================= PRINT MODE ================= */
-        @media print {
-            .no-print { display: none !important; }
-            aside { display: none !important; }
-            main { 
-                width: 100% !important; 
-                margin: 0 !important; 
-                padding: 0 !important; 
-            }
-            html, body { 
-                background: #ffffff !important; 
-                height: auto !important;
-                overflow: visible !important;
-            }
-            * { box-shadow: none !important; }
-        }
 
-        /* ================= GLOBAL ================= */
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #F8FAFC; 
-            color: #1E293B;
-            -webkit-font-smoothing: antialiased;
-        }
+<style>
+@media print {
+    .no-print { display: none !important; }
+    aside { display: none !important; }
+    main { width:100% !important; margin:0 !important; padding:0 !important; }
+    html,body { background:#ffffff !important; height:auto !important; overflow:visible !important; }
+    * { box-shadow:none !important; }
+}
 
-        .app-layout {
-            height: 100vh;
-            overflow: hidden;
-        }
+body{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    background:#F8FAFC;
+    color:#1E293B;
+}
 
-        /* High-End Sidebar Styling */
-        .sidebar-bg { background-color: #0f121d !important; }
-        
-        .sidebar-link {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
+.app-layout{
+    height:100vh;
+    overflow:hidden;
+}
 
-        .sidebar-item-active {
-            background: linear-gradient(90deg, rgba(79, 70, 229, 0.12) 0%, rgba(79, 70, 229, 0) 100%);
-            color: #ffffff !important;
-        }
+.sidebar-bg{background:#0f121d!important;}
 
-        .sidebar-item-active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 20%;
-            height: 60%;
-            width: 3px;
-            background: #6366f1;
-            border-radius: 0 4px 4px 0;
-            box-shadow: 0 0 10px rgba(99, 102, 241, 0.8);
-        }
+.sidebar-link{
+    transition:all .3s cubic-bezier(.4,0,.2,1);
+    position:relative;
+}
 
-        .sidebar-item-active i { color: #818cf8 !important; }
+.sidebar-item-active{
+    background:linear-gradient(90deg,rgba(79,70,229,.12)0%,rgba(79,70,229,0)100%);
+    color:#ffffff!important;
+}
 
-        .sidebar-link:hover:not(.sidebar-item-active) {
-            background-color: rgba(255, 255, 255, 0.03);
-            color: #ffffff;
-            transform: translateX(4px);
-        }
+.sidebar-item-active::before{
+    content:'';
+    position:absolute;
+    left:0;
+    top:20%;
+    height:60%;
+    width:3px;
+    background:#6366f1;
+    border-radius:0 4px 4px 0;
+    box-shadow:0 0 10px rgba(99,102,241,.8);
+}
 
-        /* Scrollbar aesthetics */
-        .custom-scrollbar::-webkit-scrollbar { width: 3px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { 
-            background: rgba(255, 255, 255, 0.05); 
-            border-radius: 10px; 
-        }
-    </style>
+.sidebar-item-active i{color:#818cf8!important;}
+
+.sidebar-link:hover:not(.sidebar-item-active){
+    background:rgba(255,255,255,.03);
+    color:#ffffff;
+    transform:translateX(4px);
+}
+
+.custom-scrollbar::-webkit-scrollbar{width:3px;}
+.custom-scrollbar::-webkit-scrollbar-thumb{
+    background:rgba(255,255,255,.05);
+    border-radius:10px;
+}
+</style>
 </head>
 
 <body>
-    <div class="flex h-screen app-layout">
-        
-        <aside class="w-64 sidebar-bg border-r border-white/5 hidden lg:flex flex-col shrink-0 h-full shadow-2xl z-50">
-            
-            <div class="pt-8 pb-10 px-10">
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 flex-shrink-0 relative">
-                        <div class="absolute inset-0 bg-indigo-500 blur-lg opacity-20 animate-pulse"></div>
-                        <img src="{% static 'images/primeledger.png' %}"
-                             class="w-full h-full object-contain filter brightness-110 relative z-10">
-                    </div>
 
-                    <div class="flex flex-col">
-                        <span class="text-2xl font-black text-white tracking-tighter uppercase leading-none">PRIME</span>
-                        <span class="text-2xl font-black text-white tracking-tighter uppercase leading-none">LEDGER</span>
-                        <span class="text-[7px] font-black text-indigo-500 uppercase tracking-[0.4em] mt-1.5 opacity-80">Intelligence</span>
-                    </div>
-                </div>
-            </div>
+<div class="flex h-screen app-layout">
 
-            <nav class="flex-1 px-6 space-y-1.5 mt-2 overflow-y-auto custom-scrollbar">
-                <div class="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] px-4 mb-5 opacity-40">
-                    Core Systems
-                </div>
-                
-                <a href="{% url 'dashboard' %}"
-                   class="sidebar-link flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400
-                   {% if request.resolver_match.url_name == 'dashboard' %} sidebar-item-active {% endif %}">
-                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-                    <span class="text-[11px] font-bold uppercase tracking-wider">Dashboard</span>
-                </a>
+<!-- SIDEBAR -->
+<aside class="w-64 sidebar-bg border-r border-white/5 hidden lg:flex flex-col shrink-0 h-full shadow-2xl z-50">
 
-                <a href="{% url 'invoice_create' %}"
-                   class="sidebar-link flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400
-                   {% if request.resolver_match.url_name == 'invoice_create' %} sidebar-item-active {% endif %}">
-                    <i data-lucide="file-plus" class="w-4 h-4"></i>
-                    <span class="text-[11px] font-bold uppercase tracking-wider">New Invoice</span>
-                </a>
+<!-- LOGO -->
+<div class="pt-8 pb-10 px-10">
+<div class="flex items-center gap-4">
 
-                <a href="{% url 'invoice_list' %}"
-                   class="sidebar-link flex items-center justify-between px-4 py-3.5 rounded-xl text-slate-400
-                   {% if request.resolver_match.url_name == 'invoice_list' %} sidebar-item-active {% endif %}">
-                    <div class="flex items-center gap-4">
-                        <i data-lucide="layers" class="w-4 h-4"></i>
-                        <span class="text-[11px] font-bold uppercase tracking-wider">System Ledger</span>
-                    </div>
-                    {% if pending_approval_count > 0 and perms.invoice.can_approve_cancel %}
-                        <span class="px-2 py-0.5 text-[9px] font-black rounded-full bg-amber-500 text-white shadow-[0_0_10px_rgba(245,158,11,0.3)]">
-                            {{ pending_approval_count }}
-                        </span>
-                    {% endif %}
-                </a>
+<div class="w-10 h-9 relative">
+<div class="absolute inset-0 bg-indigo-500 blur-lg opacity-20 animate-pulse"></div>
 
-                <a href="{% url 'product_list' %}"
-                   class="sidebar-link flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400
-                   {% if 'product' in request.resolver_match.url_name %} sidebar-item-active {% endif %}">
-                    <i data-lucide="package" class="w-4 h-4"></i>
-                    <span class="text-[11px] font-bold uppercase tracking-wider">Inventory</span>
-                </a>
+<img src="{% static 'images/primeledger.png' %}"
+class="w-full h-full object-contain filter brightness-110 relative z-10">
 
-                <a href="{% url 'customer_list' %}"
-                   class="sidebar-link flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400
-                   {% if 'customer' in request.resolver_match.url_name %} sidebar-item-active {% endif %}">
-                    <i data-lucide="users" class="w-4 h-4"></i>
-                    <span class="text-[11px] font-bold uppercase tracking-wider">Clients</span>
-                </a>
+</div>
 
-                <a href="{% url 'report_dashboard' %}"
-                   class="sidebar-link flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400
-                   {% if 'report' in request.resolver_match.url_name %} sidebar-item-active {% endif %}">
-                    <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
-                    <span class="text-[11px] font-bold uppercase tracking-wider">Analytics</span>
-                </a>
+<div class="flex flex-col">
+<span class="text-2xl font-black text-white tracking-tighter uppercase leading-none">PRIME</span>
+<span class="text-2xl font-black text-white tracking-tighter uppercase leading-none">LEDGER</span>
+<span class="text-[7px] font-black text-indigo-500 uppercase tracking-[0.4em] mt-1.5 opacity-80">
+Intelligence
+</span>
+</div>
 
-            </nav>
+</div>
+</div>
 
-            <div class="p-1 mt-auto border-t border-white/5">
-                <form action="{% url 'logout' %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit"
-                            class="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-rose-500/80 hover:text-rose-500 hover:bg-rose-500/5 transition-all group border border-transparent hover:border-rose-500/10">
-                        <i data-lucide="power" class="w-4 h-4 group-hover:rotate-90 transition-transform duration-500"></i>
-                        <span class="text-[10px] font-black uppercase tracking-[0.2em]">Terminate Session</span>
-                    </button>
-                </form>
-            </div>
-        </aside>
+<!-- NAVIGATION -->
+<nav class="flex-1 px-6 space-y-1.5 mt-2 overflow-y-auto custom-scrollbar">
 
-        <main class="flex-1 min-w-0 h-full overflow-y-auto bg-[#F8FAFC]">
-            <div class="h-full">
-                {% block content %}{% endblock %}
-            </div>
-        </main>
-        
-    </div>
+<!-- DASHBOARD (ADMIN ONLY) -->
+{% if not request.user.is_staff %}
+<a href="{% url 'dashboard' %}"
+class="sidebar-link flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400
+{% if request.resolver_match.url_name == 'dashboard' %} sidebar-item-active {% endif %}">
 
-    <script>
-        lucide.createIcons();
-    </script>
+<i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+<span class="text-[11px] font-bold uppercase tracking-wider">Dashboard</span>
+
+</a>
+{% endif %}
+
+
+<!-- NEW INVOICE -->
+<a href="{% url 'invoice_create' %}"
+class="sidebar-link flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400
+{% if request.resolver_match.url_name == 'invoice_create' %} sidebar-item-active {% endif %}">
+
+<i data-lucide="file-plus" class="w-4 h-4"></i>
+<span class="text-[11px] font-bold uppercase tracking-wider">New Invoice</span>
+
+</a>
+
+
+<!-- SYSTEM LEDGER -->
+<a href="{% url 'invoice_list' %}"
+class="sidebar-link flex items-center justify-between px-4 py-3.5 rounded-xl text-slate-400
+{% if request.resolver_match.url_name == 'invoice_list' %} sidebar-item-active {% endif %}">
+
+<div class="flex items-center gap-4">
+<i data-lucide="layers" class="w-4 h-4"></i>
+<span class="text-[11px] font-bold uppercase tracking-wider">System Ledger</span>
+</div>
+
+{% if pending_approval_count > 0 and perms.invoice.can_approve_cancel %}
+<span class="px-2 py-0.5 text-[9px] font-black rounded-full bg-amber-500 text-white">
+{{ pending_approval_count }}
+</span>
+{% endif %}
+
+</a>
+
+
+<!-- INVENTORY -->
+<a href="{% url 'product_list' %}"
+class="sidebar-link flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400
+{% if 'product' in request.resolver_match.url_name %} sidebar-item-active {% endif %}">
+
+<i data-lucide="package" class="w-4 h-4"></i>
+<span class="text-[11px] font-bold uppercase tracking-wider">Inventory</span>
+
+</a>
+
+
+<!-- CLIENTS -->
+<a href="{% url 'customer_list' %}"
+class="sidebar-link flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400
+{% if 'customer' in request.resolver_match.url_name %} sidebar-item-active {% endif %}">
+
+<i data-lucide="users" class="w-4 h-4"></i>
+<span class="text-[11px] font-bold uppercase tracking-wider">Clients</span>
+
+</a>
+
+
+<!-- ANALYTICS (ADMIN ONLY) -->
+{% if not request.user.is_staff %}
+<a href="{% url 'report_dashboard' %}"
+class="sidebar-link flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400
+{% if 'report' in request.resolver_match.url_name %} sidebar-item-active {% endif %}">
+
+<i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+<span class="text-[11px] font-bold uppercase tracking-wider">Analytics</span>
+
+</a>
+{% endif %}
+
+</nav>
+
+<!-- USER SECTION -->
+<div class="mt-auto border-t border-white/10 p-4">
+
+<div class="flex items-center justify-between gap-3 p-3 rounded-2xl bg-white/5 border border-white/5">
+
+<div class="flex items-center gap-3 min-w-0">
+
+<div class="h-9 w-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold">
+{{ request.user.username|slice:":1"|upper }}
+</div>
+
+<div class="truncate">
+<div class="text-xs font-bold text-white truncate">
+{{ request.user.username }}
+</div>
+
+<div class="text-[9px] text-slate-500 uppercase tracking-widest font-medium">
+Active Session
+</div>
+</div>
+
+</div>
+
+<form action="{% url 'logout' %}" method="post">
+{% csrf_token %}
+
+<button type="submit"
+class="p-2.5 rounded-xl text-slate-500 hover:text-rose-500 hover:bg-rose-500/10">
+
+<i data-lucide="power" class="w-4 h-4"></i>
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</aside>
+
+
+<!-- MAIN CONTENT -->
+<main class="flex-1 min-w-0 h-full overflow-y-auto bg-[#F8FAFC]">
+
+<div class="h-full">
+{% block content %}{% endblock %}
+</div>
+
+</main>
+
+</div>
+
+<script>
+lucide.createIcons();
+</script>
+
 </body>
 </html>

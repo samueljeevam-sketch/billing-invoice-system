@@ -242,7 +242,7 @@ def product_edit(request, pk):
 
 @login_required
 @never_cache
-
+@permission_required('invoice.delete_product', raise_exception=True)
 def product_delete(request, pk):
     product = get_object_or_404(Product, pk=pk)
 
@@ -309,6 +309,7 @@ def customer_create(request):
 
 @login_required
 @never_cache
+@permission_required('invoice.delete_customer', raise_exception=True)
 def customer_delete(request, pk):
     customer = get_object_or_404(Customer, pk=pk)
 
